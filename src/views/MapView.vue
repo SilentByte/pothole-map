@@ -27,7 +27,7 @@
                 <v-card>
                     <v-layout d-flex flex-no-wrap>
                         <v-avatar flat tile
-                                  size="125"
+                                  size="150"
                                   class="ma-3">
                             <v-img v-if="currentPothole.photoUrl"
                                    :key="currentPothole.id"
@@ -36,7 +36,8 @@
                                     <v-row class="fill-height ma-0"
                                            align="center"
                                            justify="center">
-                                        <v-progress-circular indeterminate color="grey lighten-5" />
+                                        <v-progress-circular indeterminate
+                                                             color="primary" />
                                     </v-row>
                                 </template>
                             </v-img>
