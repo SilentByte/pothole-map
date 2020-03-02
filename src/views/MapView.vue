@@ -2,6 +2,8 @@
     Pothole Map
     Copyright (c) 2020 by SilentByte <https://www.silentbyte.com/>
 -->
+
+<!--suppress HtmlUnknownTarget -->
 <template>
     <v-container ma-0 pa-0 fluid fill-height>
         <gmap-map map-type-id="roadmap"
@@ -13,8 +15,58 @@
             <gmap-marker v-for="m in markers"
                          :key="m.id"
                          :position="m.coordinates"
-                         :icon="m.iconUrl" />
+                         :icon="m.iconUrl"
+                         @click="onMarkerClick(m.id)" />
         </gmap-map>
+
+        <v-bottom-sheet inset
+                        hide-overlay
+                        max-width="800"
+                        v-model="sheet">
+            <v-sheet>
+                <v-card>
+                    <v-layout d-flex flex-no-wrap>
+                        <v-avatar flat tile
+                                  size="125"
+                                  class="ma-3">
+                            <v-img v-if="currentPothole.photoUrl"
+                                   :key="currentPothole.id"
+                                   :src="currentPothole.photoUrl">
+                                <template v-slot:placeholder>
+                                    <v-row class="fill-height ma-0"
+                                           align="center"
+                                           justify="center">
+                                        <v-progress-circular indeterminate color="grey lighten-5" />
+                                    </v-row>
+                                </template>
+                            </v-img>
+                            <v-img v-else src="@/assets/logo.png" />
+                        </v-avatar>
+
+                        <div>
+                            <v-card-title class="headline">
+                                {{ currentPothole.coordinates[0].toFixed(6) }},
+                                {{ currentPothole.coordinates[1].toFixed(6) }}
+                            </v-card-title>
+                            <v-card-subtitle class="pb-1">
+                                {{ currentPothole.deviceName }},
+                                {{ (currentPothole.confidence * 100).toFixed(0) }}%,
+                                {{ currentPothole.timestamp.toLocaleString() }}
+                            </v-card-subtitle>
+                        </div>
+
+                        <v-spacer />
+
+                        <v-btn icon
+                               color="primary"
+                               class="ma-2"
+                               @click="sheet = false">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                    </v-layout>
+                </v-card>
+            </v-sheet>
+        </v-bottom-sheet>
     </v-container>
 </template>
 
@@ -23,15 +75,45 @@
         Component,
         Vue,
     } from "vue-property-decorator";
+    import { getModule } from "vuex-module-decorators";
 
     import * as geo from "@/modules/geo";
-    import { Marker } from "@/modules/geo";
+    import { IMarker } from "@/modules/geo";
+    import { postpone } from "@/modules/utils";
+
+    import { AppModule } from "@/store/app";
+    import { IPothole } from "@/store/models";
+
+    const appState = getModule(AppModule);
 
     @Component
     export default class MapView extends Vue {
         zoom = 12;
         center = geo.point(-31.9440151, 115.8901276);
         options = geo.MAP_OPTIONS;
-        markers: Marker[] = [];
+        sheet = false;
+
+        currentPothole: IPothole = {
+            id: "",
+            deviceName: "",
+            timestamp: new Date(),
+            confidence: 0,
+            coordinates: [0, 0],
+            photoUrl: undefined,
+        };
+
+        get markers(): IMarker[] {
+            return appState.potholes.map(p => ({
+                id: p.id,
+                coordinates: geo.point(p.coordinates[0], p.coordinates[1]),
+            }));
+        }
+
+        onMarkerClick(markerId: string) {
+            postpone(() => {
+                this.sheet = true;
+                this.currentPothole = appState.potholes.find(p => p.id === markerId) as IPothole;
+            });
+        }
     }
 </script>

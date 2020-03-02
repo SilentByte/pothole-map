@@ -3,45 +3,31 @@
  * Copyright (c) 2020 by SilentByte <https://www.silentbyte.com/>
  */
 
-export interface Point {
+export interface IPoint {
     lat: number;
     lng: number;
 }
 
-export interface Marker {
+export interface IMarker {
     id: string;
-    coordinates: Point;
-    iconUrl?: string;
-}
-
-export interface MarkerOptions {
-    id: string;
-    coordinates: Point;
+    coordinates: IPoint;
     iconUrl?: string;
 }
 
 export interface Place {
     placeId: string;
     description: string;
-    coordinates: Point;
+    coordinates: IPoint;
 }
 
-export function point(latitude: number, longitude: number): Point {
+export function point(latitude: number, longitude: number): IPoint {
     return {
         lat: latitude,
         lng: longitude,
     };
 }
 
-export function marker(options: MarkerOptions): Marker {
-    return {
-        id: options.id,
-        coordinates: options.coordinates,
-        iconUrl: options.iconUrl || "",
-    }
-}
-
-export async function getUserLocation(): Promise<Point> {
+export async function getUserLocation(): Promise<IPoint> {
     if(!navigator.geolocation) {
         throw new Error("Geolocation API is not available");
     }
