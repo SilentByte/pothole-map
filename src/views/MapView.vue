@@ -6,11 +6,13 @@
 <!--suppress HtmlUnknownTarget -->
 <template>
     <v-container ma-0 pa-0 fluid fill-height>
-        <gmap-map map-type-id="roadmap"
+        <gmap-map ref="map"
+                  map-type-id="roadmap"
                   style="width: 100%; height: 100%"
                   :zoom="zoom"
                   :center="center"
-                  :options="options">
+                  :options="options"
+                  @idle="onIdle">
 
             <gmap-marker v-for="m in markers"
                          :key="m.id"
@@ -71,6 +73,7 @@
     </v-container>
 </template>
 
+<!--suppress TypeScriptUnresolvedVariable, TypeScriptUnresolvedFunction -->
 <script lang="ts">
     import {
         Component,
@@ -80,6 +83,7 @@
 
     import * as geo from "@/modules/geo";
     import { IMarker } from "@/modules/geo";
+
     import { postpone } from "@/modules/utils";
 
     import { AppModule } from "@/store/app";
@@ -89,8 +93,6 @@
 
     @Component
     export default class MapView extends Vue {
-        zoom = 12;
-        center = geo.point(-31.9440151, 115.8901276);
         options = geo.MAP_OPTIONS;
         sheet = false;
 
@@ -103,11 +105,26 @@
             photoUrl: undefined,
         };
 
+        get center() {
+            return appState.mapCenter;
+        }
+
+        get zoom() {
+            return appState.mapZoom;
+        }
+
         get markers(): IMarker[] {
             return appState.potholes.map(p => ({
                 id: p.id,
                 coordinates: geo.point(p.coordinates[0], p.coordinates[1]),
             }));
+        }
+
+        onIdle() {
+            (this.$refs.map as any).$mapPromise.then(map => {
+                appState.setMapCenter(map.getCenter());
+                appState.setMapZoom(map.getZoom());
+            });
         }
 
         onMarkerClick(markerId: string) {

@@ -6,7 +6,12 @@
 import {
     VuexModule,
     Module,
+    Mutation,
+    Action,
 } from "vuex-module-decorators";
+
+import * as geo from "@/modules/geo";
+import { IPoint } from "@/modules/geo";
 
 import store from "@/store";
 import { IPothole } from "@/store/models";
@@ -18,6 +23,10 @@ import { IPothole } from "@/store/models";
     name: "app",
 })
 export class AppModule extends VuexModule {
+    mapCenter: IPoint = geo.point(-31.9440151, 115.8901276);
+    mapZoom = 12;
+    mapUserLocationPending = false;
+
     potholes: IPothole[] = [{
         id: "139c57b0-628a-4bd1-acee-5893a697de6b",
         deviceName: "Test Device 01",
@@ -54,4 +63,30 @@ export class AppModule extends VuexModule {
         coordinates: [-31.958279460482014, 115.84404945373534],
         photoUrl: "https://picsum.photos/seed/05/1920/1080?random=5",
     }];
+
+    @Mutation
+    setMapCenter(center: IPoint) {
+        this.mapCenter = center;
+    }
+
+    @Mutation
+    setMapZoom(zoom: number) {
+        this.mapZoom = zoom;
+    }
+
+    @Mutation
+    setMapPendingUserLocation(state: boolean) {
+        this.mapUserLocationPending = state;
+    }
+
+    @Action({rawError: true})
+    doCenterOnUserLocation() {
+        this.setMapPendingUserLocation(true);
+        geo.getUserLocation()
+            .then(center => {
+                this.setMapCenter(center);
+                this.setMapZoom(12);
+            })
+            .finally(() => this.setMapPendingUserLocation(false));
+    }
 }

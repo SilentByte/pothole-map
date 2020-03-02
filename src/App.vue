@@ -19,6 +19,12 @@
                           prepend-inner-icon="mdi-magnify" />
 
             <v-spacer />
+
+            <v-btn icon
+                   :loading="userLocationPending"
+                   @click="onCenterOnUserLocation">
+                <v-icon>mdi-crosshairs-gps</v-icon>
+            </v-btn>
         </v-app-bar>
 
         <v-navigation-drawer app clipped
@@ -72,14 +78,22 @@
         Vue,
     } from "vue-property-decorator";
 
-    // import { getModule } from "vuex-module-decorators";
-    // import { AppModule } from "@/store/app";
+    import { getModule } from "vuex-module-decorators";
+    import { AppModule } from "@/store/app";
 
-    // const appState = getModule(AppModule);
+    const appState = getModule(AppModule);
 
     @Component
     export default class App extends Vue {
         drawer = null;
+
+        get userLocationPending() {
+            return appState.mapUserLocationPending;
+        }
+
+        onCenterOnUserLocation() {
+            appState.doCenterOnUserLocation();
+        }
     }
 </script>
 
