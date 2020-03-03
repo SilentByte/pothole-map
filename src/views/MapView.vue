@@ -170,6 +170,7 @@
             return appState.potholes.map(p => ({
                 id: p.id,
                 coordinates: geo.point(p.coordinates[0], p.coordinates[1]),
+                iconUrl: "/images/markers/pothole.svg",
             }));
         }
 
