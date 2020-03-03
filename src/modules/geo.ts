@@ -20,6 +20,11 @@ export interface IPlace {
     coordinates: IPoint;
 }
 
+export interface IBounds {
+    northEast: IPoint;
+    southWest: IPoint;
+}
+
 export function point(latitude: number, longitude: number): IPoint {
     return {
         lat: latitude,

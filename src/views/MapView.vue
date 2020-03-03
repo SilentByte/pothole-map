@@ -119,6 +119,8 @@
 
 <!--suppress TypeScriptUnresolvedVariable, TypeScriptUnresolvedFunction -->
 <script lang="ts">
+    import _ from "lodash";
+
     import {
         Component,
         Vue,
@@ -134,6 +136,8 @@
     import { IPothole } from "@/store/models";
 
     const appState = getModule(AppModule);
+
+    const debouncedDoFetchPotholes = _.debounce(appState.doFetchPotholes, 100);
 
     @Component
     export default class MapView extends Vue {
@@ -196,13 +200,19 @@
             }));
         }
 
-        onIdle() {
-            (this.$refs.map as any).$mapPromise.then((map: any) => {
-                appState.setMapCenter({
-                    lat: map.getCenter().lat(),
-                    lng: map.getCenter().lng(),
-                });
-                appState.setMapZoom(map.getZoom());
+        async onIdle() {
+            const map = await (this.$refs.map as any).$mapPromise;
+
+            appState.setMapZoom(map.getZoom());
+            appState.setMapCenter({
+                lat: map.getCenter().lat(),
+                lng: map.getCenter().lng(),
+            });
+
+            const bounds = map.getBounds();
+            await debouncedDoFetchPotholes({
+                northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
+                southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
             });
         }
 

@@ -10,11 +10,29 @@ import {
     Action,
 } from "vuex-module-decorators";
 
+import * as ensure from "@/modules/ensure";
 import * as geo from "@/modules/geo";
-import { IPoint } from "@/modules/geo";
+import { IBounds, IPoint } from "@/modules/geo";
+import { rest } from "@/modules/api";
 
 import store from "@/store";
 import { IPothole } from "@/store/models";
+
+function coordinatesFromAny(data: any): [number, number] {
+    data = ensure.array(data);
+    return [ensure.number(data[0]), ensure.number(data[1])];
+}
+
+function potholeFromAny(data: any): IPothole {
+    return {
+        id: ensure.uuid(data.id),
+        deviceName: ensure.string(data.deviceName),
+        timestamp: ensure.date(data.timestamp),
+        confidence: ensure.number(data.confidence),
+        coordinates: coordinatesFromAny(data.coordinates),
+        photoUrl: ensure.optional(data.photoUrl, ensure.string),
+    };
+}
 
 @Module({
     store,
@@ -28,42 +46,7 @@ export class AppModule extends VuexModule {
     mapUserMarker: IPoint | null = null;
     mapUserLocationPending = false;
 
-    potholes: IPothole[] = [{
-        id: "139c57b0-628a-4bd1-acee-5893a697de6b",
-        deviceName: "Test Device 01",
-        timestamp: new Date(),
-        confidence: 0.5,
-        coordinates: [-31.934390853103174, 115.81598281860352],
-        photoUrl: "https://picsum.photos/seed/01/1920/1080?random=1",
-    }, {
-        id: "2e69f436-495b-450c-884e-abe414dcc402",
-        deviceName: "Test Device 02",
-        timestamp: new Date(),
-        confidence: 0.5,
-        coordinates: [-31.919093057279348, 115.84928512573241],
-        photoUrl: undefined,
-    }, {
-        id: "1a73b00b-1c88-46fb-a619-771c6abb2686",
-        deviceName: "Test Device 03",
-        timestamp: new Date(),
-        confidence: 0.5,
-        coordinates: [-31.914503222291746, 115.82714080810547],
-        photoUrl: "https://picsum.photos/seed/03/1920/1080?random=3",
-    }, {
-        id: "bf4b99c3-e491-4425-9578-bb7750ebc35e",
-        deviceName: "Test Device 04",
-        timestamp: new Date(),
-        confidence: 0.5,
-        coordinates: [-31.943131307956442, 115.8295440673828],
-        photoUrl: "https://picsum.photos/seed/04/1920/1080?random=4",
-    }, {
-        id: "18e9468d-3dd6-47c4-a63a-ba0aa9ea923e",
-        deviceName: "Test Device 05",
-        timestamp: new Date(),
-        confidence: 0.5,
-        coordinates: [-31.958279460482014, 115.84404945373534],
-        photoUrl: "https://picsum.photos/seed/05/1920/1080?random=5",
-    }];
+    potholes: IPothole[] = [];
 
     @Mutation
     setMapCenter(center: IPoint) {
@@ -85,7 +68,12 @@ export class AppModule extends VuexModule {
         this.mapUserLocationPending = state;
     }
 
-    @Action
+    @Mutation
+    setPotholes(potholes: IPothole[]) {
+        this.potholes = potholes;
+    }
+
+    @Action({rawError: true})
     doCenterOnUserLocation() {
         this.setMapPendingUserLocation(true);
         geo.getUserLocation()
@@ -97,10 +85,24 @@ export class AppModule extends VuexModule {
             .finally(() => this.setMapPendingUserLocation(false));
     }
 
-    @Action
+    @Action({rawError: true})
     doCenterOnLocation(center: IPoint) {
         this.setMapCenter(center);
         this.setMapZoom(15);
         this.setUserMarker(center);
+    }
+
+    @Action({rawError: true})
+    async doFetchPotholes(bounds: IBounds) {
+        const response = await rest().get("potholes", {
+            params: {
+                nelat: bounds.northEast.lat,
+                nelng: bounds.northEast.lng,
+                swlat: bounds.southWest.lat,
+                swlng: bounds.southWest.lng,
+            },
+        });
+
+        this.setPotholes(response.data.map(potholeFromAny));
     }
 }
