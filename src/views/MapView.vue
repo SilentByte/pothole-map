@@ -28,23 +28,39 @@
             <v-sheet>
                 <v-card>
                     <v-layout d-flex flex-no-wrap>
-                        <v-avatar flat tile
-                                  size="150"
-                                  class="ma-3">
-                            <v-img v-if="currentPothole.photoUrl"
-                                   :key="currentPothole.id"
-                                   :src="currentPothole.photoUrl">
-                                <template v-slot:placeholder>
-                                    <v-row class="fill-height ma-0"
-                                           align="center"
-                                           justify="center">
-                                        <v-progress-circular indeterminate
-                                                             color="primary" />
-                                    </v-row>
-                                </template>
-                            </v-img>
-                            <v-img v-else src="@/assets/logo.png" />
-                        </v-avatar>
+                        <v-hover v-slot:default="{ hover }">
+                            <v-avatar flat tile
+                                      size="150"
+                                      class="ma-3 pothole-thumbnail"
+                                      @click="onPreviewPhoto">
+                                <v-img v-if="currentPothole.photoUrl"
+                                       :key="currentPothole.id"
+                                       :src="currentPothole.photoUrl">
+                                    <template v-slot:placeholder>
+                                        <v-row class="fill-height ma-0"
+                                               align="center"
+                                               justify="center">
+                                            <v-progress-circular indeterminate
+                                                                 color="primary" />
+                                        </v-row>
+                                    </template>
+
+                                    <v-fade-transition>
+                                        <v-layout v-if="hover"
+                                                  d-flex
+                                                  justify-center align-center
+                                                  transition-fast-in-fast-out
+                                                  style="background: rgba(0, 0, 0, 0.4)">
+                                            <v-icon x-large
+                                                    color="white">
+                                                mdi-magnify-plus
+                                            </v-icon>
+                                        </v-layout>
+                                    </v-fade-transition>
+                                </v-img>
+                                <v-img v-else src="@/assets/logo.png" />
+                            </v-avatar>
+                        </v-hover>
 
                         <div>
                             <v-card-title class="headline">
@@ -70,6 +86,27 @@
                 </v-card>
             </v-sheet>
         </v-bottom-sheet>
+
+        <v-dialog v-model="photoPreview"
+                  :max-width="$vuetify.breakpoint.name === 'sm' ? '100%' : '80%'">
+            <v-card flat>
+                <v-img v-if="currentPothole.photoUrl"
+                       contain
+                       :max-height="$vuetify.breakpoint.name === 'sm' ? '100%' : '80%'"
+                       :key="currentPothole.id"
+                       :src="currentPothole.photoUrl"
+                       @click="photoPreview = false">
+                    <template v-slot:placeholder>
+                        <v-row class="fill-height ma-0"
+                               align="center"
+                               justify="center">
+                            <v-progress-circular indeterminate
+                                                 color="primary" />
+                        </v-row>
+                    </template>
+                </v-img>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -95,6 +132,7 @@
     export default class MapView extends Vue {
         options = geo.MAP_OPTIONS;
         sheet = false;
+        photoPreview = false;
 
         currentPothole: IPothole = {
             id: "",
@@ -121,7 +159,7 @@
         }
 
         onIdle() {
-            (this.$refs.map as any).$mapPromise.then(map => {
+            (this.$refs.map as any).$mapPromise.then((map: any) => {
                 appState.setMapCenter(map.getCenter());
                 appState.setMapZoom(map.getZoom());
             });
@@ -133,5 +171,17 @@
                 this.currentPothole = appState.potholes.find(p => p.id === markerId) as IPothole;
             });
         }
+
+        onPreviewPhoto() {
+            if(this.currentPothole.photoUrl) {
+                this.photoPreview = true;
+            }
+        }
     }
 </script>
+
+<style lang="scss">
+    .pothole-thumbnail {
+        cursor: pointer !important;
+    }
+</style>
