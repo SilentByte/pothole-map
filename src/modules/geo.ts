@@ -14,7 +14,7 @@ export interface IMarker {
     iconUrl?: string;
 }
 
-export interface Place {
+export interface IPlace {
     placeId: string;
     description: string;
     coordinates: IPoint;

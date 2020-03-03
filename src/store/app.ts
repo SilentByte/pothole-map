@@ -25,6 +25,7 @@ import { IPothole } from "@/store/models";
 export class AppModule extends VuexModule {
     mapCenter: IPoint = geo.point(-31.9440151, 115.8901276);
     mapZoom = 12;
+    mapUserMarker: IPoint | null = null;
     mapUserLocationPending = false;
 
     potholes: IPothole[] = [{
@@ -75,18 +76,31 @@ export class AppModule extends VuexModule {
     }
 
     @Mutation
+    setUserMarker(center: IPoint | null) {
+        this.mapUserMarker = center;
+    }
+
+    @Mutation
     setMapPendingUserLocation(state: boolean) {
         this.mapUserLocationPending = state;
     }
 
-    @Action({rawError: true})
+    @Action
     doCenterOnUserLocation() {
         this.setMapPendingUserLocation(true);
         geo.getUserLocation()
             .then(center => {
                 this.setMapCenter(center);
                 this.setMapZoom(12);
+                this.setUserMarker(center);
             })
             .finally(() => this.setMapPendingUserLocation(false));
+    }
+
+    @Action
+    doCenterOnLocation(center: IPoint) {
+        this.setMapCenter(center);
+        this.setMapZoom(15);
+        this.setUserMarker(center);
     }
 }

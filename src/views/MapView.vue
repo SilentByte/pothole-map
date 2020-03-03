@@ -14,6 +14,10 @@
                   :options="options"
                   @idle="onIdle">
 
+            <gmap-marker v-if="userMarker"
+                         :position="userMarker.coordinates"
+                         :icon="userMarker.iconUrl" />
+
             <gmap-marker v-for="m in markers"
                          :key="m.id"
                          :position="m.coordinates"
@@ -151,6 +155,17 @@
             return appState.mapZoom;
         }
 
+        get userMarker(): IMarker | null {
+            if(!appState.mapUserMarker) {
+                return null;
+            }
+
+            return {
+                id: "user-marker",
+                coordinates: appState.mapUserMarker,
+            };
+        }
+
         get markers(): IMarker[] {
             return appState.potholes.map(p => ({
                 id: p.id,
@@ -160,7 +175,10 @@
 
         onIdle() {
             (this.$refs.map as any).$mapPromise.then((map: any) => {
-                appState.setMapCenter(map.getCenter());
+                appState.setMapCenter({
+                    lat: map.getCenter().lat(),
+                    lng: map.getCenter().lng(),
+                });
                 appState.setMapZoom(map.getZoom());
             });
         }

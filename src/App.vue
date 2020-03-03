@@ -12,19 +12,16 @@
 
             <span class="title ml-3 mr-5 text-uppercase">Pothole<span class="font-weight-light">Map</span></span>
 
-            <v-text-field solo-inverted
-                          flat
-                          hide-details
-                          label="Search…"
-                          prepend-inner-icon="mdi-magnify" />
-
-            <v-spacer />
+            <AddressAutocomplete :bias-coordinates="mapCenter"
+                                 @address-selected="onAddressSelected" />
 
             <v-btn icon
                    :loading="userLocationPending"
                    @click="onCenterOnUserLocation">
                 <v-icon>mdi-crosshairs-gps</v-icon>
             </v-btn>
+
+            <v-spacer />
         </v-app-bar>
 
         <v-navigation-drawer app clipped
@@ -78,12 +75,18 @@
         Vue,
     } from "vue-property-decorator";
 
+    import AddressAutocomplete from "@/components/AddressAutocomplete.vue";
+
+    import { IPlace } from "@/modules/geo";
+
     import { getModule } from "vuex-module-decorators";
     import { AppModule } from "@/store/app";
 
     const appState = getModule(AppModule);
 
-    @Component
+    @Component({
+        components: {AddressAutocomplete},
+    })
     export default class App extends Vue {
         drawer = null;
 
@@ -91,8 +94,16 @@
             return appState.mapUserLocationPending;
         }
 
+        get mapCenter() {
+            return appState.mapCenter;
+        }
+
         onCenterOnUserLocation() {
             appState.doCenterOnUserLocation();
+        }
+
+        onAddressSelected(place: IPlace) {
+            appState.doCenterOnLocation(place.coordinates);
         }
     }
 </script>
