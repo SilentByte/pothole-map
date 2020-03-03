@@ -19,6 +19,7 @@
                          :icon="userMarker.iconUrl" />
 
             <gmap-cluster :minimum-cluster-size="5"
+                          :zoom-on-click="true"
                           :styles="clusterStyles">
                 <gmap-marker v-for="m in markers"
                              :key="m.id"
