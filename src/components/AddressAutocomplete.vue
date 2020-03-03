@@ -13,6 +13,7 @@
                     hide-details
                     clearable
                     return-object
+                    spellcheck="false"
                     item-text="description"
                     item-value="placeId"
                     placeholder="Search…"
