@@ -18,11 +18,14 @@
                          :position="userMarker.coordinates"
                          :icon="userMarker.iconUrl" />
 
-            <gmap-marker v-for="m in markers"
-                         :key="m.id"
-                         :position="m.coordinates"
-                         :icon="m.iconUrl"
-                         @click="onMarkerClick(m.id)" />
+            <gmap-cluster :minimum-cluster-size="5"
+                          :styles="clusterStyles">
+                <gmap-marker v-for="m in markers"
+                             :key="m.id"
+                             :position="m.coordinates"
+                             :icon="m.iconUrl"
+                             @click="onMarkerClick(m.id)" />
+            </gmap-cluster>
         </gmap-map>
 
         <v-bottom-sheet inset
@@ -146,6 +149,25 @@
             coordinates: [0, 0],
             photoUrl: undefined,
         };
+
+        clusterStyles = [
+            {
+                url: "./images/markers/m1.svg",
+                height: 32,
+                width: 32,
+                anchor: [16, 16],
+                textColor: "#fff",
+                textSize: 10,
+            },
+            {
+                url: "./images/markers/m2.svg",
+                height: 50,
+                width: 50,
+                anchor: [25, 25],
+                textColor: "#fff",
+                textSize: 12,
+            },
+        ];
 
         get center() {
             return appState.mapCenter;

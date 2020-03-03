@@ -6,6 +6,10 @@
 import Vue from "vue";
 import * as VueGoogleMaps from "vue2-google-maps";
 
+import GmapCluster from "vue2-google-maps/dist/components/cluster";
+
+Vue.component("GmapCluster", GmapCluster);
+
 // noinspection TypeScriptUnresolvedVariable
 Vue.use(VueGoogleMaps as any, {
     load: {

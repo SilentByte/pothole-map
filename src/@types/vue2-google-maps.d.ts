@@ -4,4 +4,6 @@
  */
 
 declare const google: any;
+
 declare module "vue2-google-maps";
+declare module 'vue2-google-maps/dist/components/cluster';
