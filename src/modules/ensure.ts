@@ -7,7 +7,6 @@ type PrimitiveTypes = "boolean" | "number" | "string";
 
 function throwOnUndefinedOrNull(value: any) {
     if(value === undefined || value === null) {
-        console.trace("Value expected, received null or undefined");
         throw new Error("Value expected, received null or undefined");
     }
 }
@@ -16,8 +15,6 @@ function throwOnWrongType(value: any, type: PrimitiveTypes) {
     throwOnUndefinedOrNull(value);
 
     if(typeof value !== type) {
-        console.trace(`Type '${type}' expected, received ${typeof value} for value:`);
-        console.trace(value);
         throw new Error(`Type '${type}' expected, received ${typeof value}`);
     }
 }

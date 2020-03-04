@@ -12,7 +12,8 @@
                   :zoom="zoom"
                   :center="center"
                   :options="options"
-                  @idle="onIdle">
+                  @idle="onIdle"
+                  @bounds_changed="onBoundsChanged">
 
             <gmap-marker v-if="userMarker"
                          :position="userMarker.coordinates"
@@ -217,6 +218,24 @@
             });
         }
 
+        async onBoundsChanged() {
+            const map = await (this.$refs.map as any).$mapPromise;
+
+            const latitude = map.getCenter().lat().toFixed(7);
+            const longitude = map.getCenter().lng().toFixed(7);
+            const zoom = map.getZoom().toFixed(2);
+
+            const options = `@${latitude},${longitude},${zoom}z`;
+            if(this.$route.params.options !== options) {
+                await this.$router.replace({
+                    name: "MapView",
+                    params: {
+                        options,
+                    },
+                });
+            }
+        }
+
         onMarkerClick(markerId: string) {
             postpone(() => {
                 this.sheet = true;
@@ -227,6 +246,16 @@
         onPreviewPhoto() {
             if(this.currentPothole.photoUrl) {
                 this.photoPreview = true;
+            }
+        }
+
+        mounted() {
+            if(this.$route.params.options) {
+                const options = geo.extractMapViewOptions(this.$route.params.options);
+                if(options) {
+                    appState.setMapZoom(options.zoom);
+                    appState.setMapCenter(options.coordinates);
+                }
             }
         }
     }

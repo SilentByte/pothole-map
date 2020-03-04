@@ -25,6 +25,11 @@ export interface IBounds {
     southWest: IPoint;
 }
 
+export interface IMapViewOptions {
+    coordinates: IPoint;
+    zoom: number;
+}
+
 export function point(latitude: number, longitude: number): IPoint {
     return {
         lat: latitude,
@@ -42,6 +47,18 @@ export async function getUserLocation(): Promise<IPoint> {
     });
 
     return point(position.coords.latitude, position.coords.longitude);
+}
+
+export function extractMapViewOptions(text: string): IMapViewOptions | null {
+    const matches = /@(-?\d+(\.\d+)?),(-?\d+(\.\d+)?),(\d+(\.\d+)?)z/.exec(text);
+    if(!matches) {
+        return null;
+    }
+
+    return {
+        coordinates: point(parseFloat(matches[1]), parseFloat(matches[3])),
+        zoom: parseFloat(matches[5]),
+    };
 }
 
 export const MAP_OPTIONS = {

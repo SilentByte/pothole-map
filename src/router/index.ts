@@ -11,9 +11,13 @@ Vue.use(VueRouter);
 
 const routes = [
     {
-        path: "/",
+        path: "/:options(@[\\-0-9\\.\\,]+z)?",
         name: "MapView",
         component: MapView,
+    },
+    {
+        path: "*",
+        redirect: "/",
     },
 ];
 
