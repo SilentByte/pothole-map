@@ -1,0 +1,40 @@
+##
+##  Pothole Map
+##  Copyright (c) 2020 by SilentByte <https://www.silentbyte.com/>
+##
+
+service: pothole-map
+
+provider:
+  name: aws
+  runtime: python3.7
+
+functions:
+  query:
+    handler: potholemap/lambdas.query_handler
+    events:
+      - http:
+          path: query
+          method: get
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+  - serverless-python-requirements
+
+package:
+  exclude:
+    - venv/**
+    - node_modules/**
+    - __pycache__/**
+    - "*.py[cod]"
+    - "*$py.class"
+    - .idea/**
+    - .serverless/**
+    - htmlcov/**
+    - .coverage
+    - .env*
+
+custom:
+  pythonRequirements:
+    dockerizePip: true

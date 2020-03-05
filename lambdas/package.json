@@ -1,0 +1,27 @@
+{
+  "name": "pothole-map",
+  "version": "0.0.1",
+  "description": "Pothole Map",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "serverless deploy",
+    "dev": "serverless offline --port 8888 --printOutput"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SilentByte/pothole-map.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SilentByte/pothole-map/issues"
+  },
+  "homepage": "https://github.com/SilentByte/pothole-map#readme",
+  "devDependencies": {
+    "serverless": "^1.65.0",
+    "serverless-dotenv-plugin": "^2.3.2",
+    "serverless-offline": "^5.12.1",
+    "serverless-python-requirements": "^5.1.0"
+  }
+}
