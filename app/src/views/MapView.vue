@@ -139,7 +139,7 @@
 
     const appState = getModule(AppModule);
 
-    const debouncedDoFetchPotholes = _.debounce(appState.doFetchPotholes, 100);
+    const debouncedDoFetchPotholes = _.debounce(appState.doFetchPotholes, 500);
 
     @Component
     export default class MapView extends Vue {

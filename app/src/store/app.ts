@@ -94,7 +94,7 @@ export class AppModule extends VuexModule {
 
     @Action({rawError: true})
     async doFetchPotholes(bounds: IBounds) {
-        const response = await rest().get("potholes", {
+        const response = await rest().get("query", {
             params: {
                 nelat: bounds.northEast.lat,
                 nelng: bounds.northEast.lng,

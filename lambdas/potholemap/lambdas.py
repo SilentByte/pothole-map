@@ -5,13 +5,19 @@
 
 import json
 import logging
+import pytz
+
+from uuid import uuid4, UUID
+from random import Random
+from datetime import datetime, timedelta
 
 from abc import abstractmethod
 from typing import (
-    Optional,
-    Union,
-    Dict,
     Any,
+    Dict,
+    Optional,
+    Tuple,
+    Union,
 )
 
 from potholemap import httpstatus
@@ -21,7 +27,22 @@ log = logging.getLogger(__name__)
 
 
 def _jsonify(data: Union[dict, list]) -> str:
-    return json.dumps(data, indent=None, separators=(',', ':'), sort_keys=True)
+    class ExtendedEncoder(json.JSONEncoder):
+        def default(self, o):
+            if isinstance(o, UUID):
+                return str(o)
+            elif isinstance(o, datetime):
+                return o.isoformat()
+            else:
+                return json.JSONEncoder.default(self, o)
+
+    return json.dumps(
+        data,
+        indent=None,
+        separators=(',', ':'),
+        sort_keys=True,
+        cls=ExtendedEncoder,
+    )
 
 
 class Event:
@@ -132,10 +153,46 @@ class Lambda:
 
 
 class QueryLambda(Lambda):
+    @staticmethod
+    def _extract_bounds(query_params: CaseInsensitiveDict) -> Optional[Tuple[float, float, float, float]]:
+        nelat = query_params.get('nelat', None)
+        nelng = query_params.get('nelng', None)
+        swlat = query_params.get('swlat', None)
+        swlng = query_params.get('swlng', None)
+
+        if None in (nelat, nelng, swlat, swlng):
+            return None
+
+        try:
+            return float(nelat), float(nelng), float(swlat), float(swlng)
+        except ValueError:
+            return None
+
     def handle(self, event: Event, context: Context) -> Response:
-        return JsonResponse({
-            'test': 'ok',
-        })
+        bounds = QueryLambda._extract_bounds(event.query_params)
+        if bounds is None:
+            return JsonResponse(
+                status_code=httpstatus.HTTP_400_BAD_REQUEST,
+                data={'message': 'Query parameters (nelat, nelng, swlat, swlng) must be set correctly'},
+            )
+
+        # TODO: Implement DynamoDB query.
+        generator = Random(0)
+        potholes = [{
+            "id": UUID(int=i),
+            "deviceName": f'Test Device {i}',
+            "timestamp": datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(seconds=i * 10),
+            "confidence": generator.random(),
+            "coordinates": [
+                -31.958279460482014 + generator.random() * 0.5 - 0.25,
+                115.84404945373534 + generator.random() * 0.5 - 0.25,
+            ],
+            "photoUrl": f'https://picsum.photos/seed/05/1920/1080?random={i}'
+        } for i in range(100)]
+
+        return JsonResponse(list(filter(
+            lambda p: (bounds[2] < p['coordinates'][0] < bounds[0]
+                       and bounds[3] < p['coordinates'][1] < bounds[1]), potholes)))
 
 
 query_handler = QueryLambda().bind()
