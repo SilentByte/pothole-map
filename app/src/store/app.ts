@@ -46,6 +46,7 @@ export class AppModule extends VuexModule {
     mapUserMarker: IPoint | null = null;
     mapUserLocationPending = false;
 
+    potholeIndex: Set<string> = new Set<string>();
     potholes: IPothole[] = [];
 
     @Mutation
@@ -69,8 +70,13 @@ export class AppModule extends VuexModule {
     }
 
     @Mutation
-    setPotholes(potholes: IPothole[]) {
-        this.potholes = potholes;
+    mergePotholes(potholes: IPothole[]) {
+        potholes.forEach(p => {
+            if(!this.potholeIndex.has(p.id)) {
+                this.potholeIndex.add(p.id);
+                this.potholes.push(p);
+            }
+        });
     }
 
     @Action({rawError: true})
@@ -103,6 +109,6 @@ export class AppModule extends VuexModule {
             },
         });
 
-        this.setPotholes(response.data.map(potholeFromAny));
+        this.mergePotholes(response.data.map(potholeFromAny));
     }
 }
