@@ -45,9 +45,14 @@ export class AppModule extends VuexModule {
     mapZoom = 12;
     mapUserMarker: IPoint | null = null;
     mapUserLocationPending = false;
+    mapBusyCounter = 0;
 
     potholeIndex: Set<string> = new Set<string>();
     potholes: IPothole[] = [];
+
+    get mapIsBusy() {
+        return this.mapBusyCounter !== 0;
+    }
 
     @Mutation
     setMapCenter(center: IPoint) {
@@ -79,6 +84,14 @@ export class AppModule extends VuexModule {
         });
     }
 
+    @Mutation setMapBusy(busy: boolean) {
+        if(busy) {
+            this.mapBusyCounter += 1;
+        } else {
+            this.mapBusyCounter -= 1;
+        }
+    }
+
     @Action({rawError: true})
     doCenterOnUserLocation() {
         this.setMapPendingUserLocation(true);
@@ -100,15 +113,20 @@ export class AppModule extends VuexModule {
 
     @Action({rawError: true})
     async doFetchPotholes(bounds: IBounds) {
-        const response = await rest().get("query", {
-            params: {
-                nelat: bounds.northEast.lat,
-                nelng: bounds.northEast.lng,
-                swlat: bounds.southWest.lat,
-                swlng: bounds.southWest.lng,
-            },
-        });
+        try {
+            this.setMapBusy(true);
+            const response = await rest().get("query", {
+                params: {
+                    nelat: bounds.northEast.lat,
+                    nelng: bounds.northEast.lng,
+                    swlat: bounds.southWest.lat,
+                    swlng: bounds.southWest.lng,
+                },
+            });
 
-        this.mergePotholes(response.data.map(potholeFromAny));
+            this.mergePotholes(response.data.map(potholeFromAny));
+        } finally {
+            this.setMapBusy(false);
+        }
     }
 }

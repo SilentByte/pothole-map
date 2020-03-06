@@ -6,6 +6,12 @@
 <!--suppress HtmlUnknownTarget -->
 <template>
     <v-container ma-0 pa-0 fluid fill-height>
+        <v-progress-linear absolute top
+                           indeterminate
+                           color="primary"
+                           height="3"
+                           :active="mapIsBusy" />
+
         <gmap-map ref="map"
                   map-type-id="roadmap"
                   style="width: 100%; height: 100%"
@@ -174,6 +180,10 @@
                 textSize: 12,
             },
         ];
+
+        get mapIsBusy() {
+            return appState.mapIsBusy;
+        }
 
         get center() {
             return appState.mapCenter;
