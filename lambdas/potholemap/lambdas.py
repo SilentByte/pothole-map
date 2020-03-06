@@ -7,7 +7,7 @@ import json
 import logging
 import pytz
 
-from uuid import uuid4, UUID
+from uuid import UUID
 from random import Random
 from datetime import datetime, timedelta
 
@@ -129,6 +129,7 @@ class Lambda:
         return Context()
 
     def bind(self) -> callable:
+        # noinspection PyBroadException
         def handler(event, context) -> dict:
             try:
                 response = self.handle(
@@ -146,6 +147,12 @@ class Lambda:
                 log.warning(f'[GatewayException] {e}')
                 return {
                     'statusCode': e.status_code,
+                    'body': None,
+                }
+            except:
+                log.exception('Unhandled exception')
+                return {
+                    'statusCode': httpstatus.HTTP_500_INTERNAL_SERVER_ERROR,
                     'body': None,
                 }
 
