@@ -6,6 +6,7 @@
 import json
 import logging
 import pytz
+import geohash2
 
 from uuid import UUID
 from random import Random
@@ -183,23 +184,37 @@ class QueryLambda(Lambda):
                 data={'message': 'Query parameters (nelat, nelng, swlat, swlng) must be set correctly'},
             )
 
-        # TODO: Implement DynamoDB query.
-        generator = Random(0)
-        potholes = [{
-            "id": UUID(int=i),
-            "deviceName": f'Test Device {i}',
-            "timestamp": datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(seconds=i * 10),
-            "confidence": generator.random(),
-            "coordinates": [
-                -31.958279460482014 + generator.random() * 0.5 - 0.25,
-                115.84404945373534 + generator.random() * 0.5 - 0.25,
-            ],
-            "photoUrl": f'https://picsum.photos/seed/05/1920/1080?random={i}'
-        } for i in range(100)]
+        nelat, nelng, swlat, swlng = bounds
 
-        return JsonResponse(list(filter(
-            lambda p: (bounds[2] < p['coordinates'][0] < bounds[0]
-                       and bounds[3] < p['coordinates'][1] < bounds[1]), potholes)))
+        # TODO: Implement as DynamoDB query.
+        generator = Random(0)
+        potholes = []
+        for i in range(100000):
+            coordinates = [
+                -31.958279460482014 + (generator.random() * 5 - 2.5),
+                115.84404945373534 + (generator.random() * 5 - 2.5),
+            ]
+
+            record = {
+                "id": UUID(int=generator.getrandbits(128)),
+                "deviceName": f'Test Device {i}',
+                "timestamp": datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(seconds=i * 10),
+                "confidence": generator.random(),
+                "coordinates": coordinates,
+                "geohash": geohash2.encode(coordinates[0], coordinates[1]),
+                "photoUrl": f'https://picsum.photos/seed/05/1920/1080?random={i}'
+            }
+
+            potholes.append(record)
+
+        lower = geohash2.encode(swlat, swlng)
+        upper = geohash2.encode(nelat, nelng)
+
+        potholes = list(filter(lambda p: lower < p['geohash'] < upper, potholes))
+        potholes = sorted(potholes, key=lambda p: p['id'])
+        potholes = potholes[:100]
+
+        return JsonResponse(potholes)
 
 
 query_handler = QueryLambda().bind()
