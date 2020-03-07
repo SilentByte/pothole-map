@@ -185,6 +185,7 @@ class QueryLambda(Lambda):
             )
 
         nelat, nelng, swlat, swlng = bounds
+        limit = 200
 
         # TODO: Implement as DynamoDB query.
         generator = Random(0)
@@ -210,11 +211,14 @@ class QueryLambda(Lambda):
         lower = geohash2.encode(swlat, swlng)
         upper = geohash2.encode(nelat, nelng)
 
-        potholes = list(filter(lambda p: lower < p['geohash'] < upper, potholes))
+        potholes = list(filter(lambda p: lower <= p['geohash'] <= upper, potholes))
         potholes = sorted(potholes, key=lambda p: p['id'])
-        potholes = potholes[:100]
+        potholes = potholes[:limit + 1]
 
-        return JsonResponse(potholes)
+        return JsonResponse({
+            'potholes': potholes,
+            'truncated': len(potholes) > limit,
+        })
 
 
 query_handler = QueryLambda().bind()

@@ -112,7 +112,7 @@ export class AppModule extends VuexModule {
     }
 
     @Action({rawError: true})
-    async doFetchPotholes(bounds: IBounds) {
+    async doFetchPotholes(bounds: IBounds): Promise<{ truncated: boolean }> {
         try {
             this.setMapBusy(true);
             const response = await rest().get("query", {
@@ -124,7 +124,12 @@ export class AppModule extends VuexModule {
                 },
             });
 
-            this.mergePotholes(response.data.map(potholeFromAny));
+            const potholes = response.data.potholes.map(potholeFromAny);
+            this.mergePotholes(potholes);
+
+            return {
+                truncated: response.data.truncated,
+            };
         } finally {
             this.setMapBusy(false);
         }

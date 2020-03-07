@@ -11,6 +11,34 @@
                            color="primary"
                            height="3"
                            :active="mapIsBusy" />
+        <v-snackbar absolute bottom
+                    v-model="zoomSnackbar"
+                    :timeout="6000">
+            <div>
+                <v-icon dark left>mdi-magnify-plus</v-icon>
+                <span class="font-weight-bold">Zoom in!</span> There are more results available.
+            </div>
+
+            <v-btn dark icon
+                   @click="zoomSnackbar = false">
+                <v-icon>mdi-close</v-icon>
+            </v-btn>
+        </v-snackbar>
+
+        <v-snackbar absolute top
+                    color="error"
+                    v-model="errorSnackbar"
+                    :timeout="6000">
+            <div>
+                <v-icon dark left>mdi-alert-circle</v-icon>
+                <span class="font-weight-bold">Oh no!</span> An error occurred &mdash; please refresh the page.
+            </div>
+
+            <v-btn dark icon
+                   @click="errorSnackbar = false">
+                <v-icon>mdi-close</v-icon>
+            </v-btn>
+        </v-snackbar>
 
         <gmap-map ref="map"
                   map-type-id="roadmap"
@@ -145,11 +173,16 @@
 
     const appState = getModule(AppModule);
 
-    const debouncedDoFetchPotholes = _.debounce(appState.doFetchPotholes, 500);
+    const debouncedDoFetchPotholes = _.debounce(appState.doFetchPotholes, 1000, {
+        leading: true,
+        trailing: false,
+    });
 
     @Component
     export default class MapView extends Vue {
         options = geo.MAP_OPTIONS;
+        zoomSnackbar = false;
+        errorSnackbar = false;
         sheet = false;
         photoPreview = false;
 
@@ -213,19 +246,27 @@
         }
 
         async onIdle() {
-            const map = await (this.$refs.map as any).$mapPromise;
+            try {
+                const map = await (this.$refs.map as any).$mapPromise;
 
-            appState.setMapZoom(map.getZoom());
-            appState.setMapCenter({
-                lat: map.getCenter().lat(),
-                lng: map.getCenter().lng(),
-            });
+                appState.setMapZoom(map.getZoom());
+                appState.setMapCenter({
+                    lat: map.getCenter().lat(),
+                    lng: map.getCenter().lng(),
+                });
 
-            const bounds = map.getBounds();
-            await debouncedDoFetchPotholes({
-                northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
-                southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
-            });
+                const bounds = map.getBounds();
+                const {truncated} = await debouncedDoFetchPotholes({
+                    northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
+                    southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
+                });
+
+                if(truncated) {
+                    this.zoomSnackbar = true;
+                }
+            } catch {
+                this.errorSnackbar = true;
+            }
         }
 
         async onBoundsChanged() {
