@@ -13,4 +13,4 @@ htmlcov/
 
 .env*
 db.sqlite
-
+package-lock.json
