@@ -112,16 +112,15 @@ export class AppModule extends VuexModule {
     }
 
     @Action({rawError: true})
-    async doFetchPotholes(bounds: IBounds): Promise<{ truncated: boolean }> {
+    async doFetchPotholes(bounds: IBounds, limit: number): Promise<{ truncated: boolean }> {
         try {
             this.setMapBusy(true);
-            const response = await rest().get("query", {
-                params: {
-                    nelat: bounds.northEast.lat,
-                    nelng: bounds.northEast.lng,
-                    swlat: bounds.southWest.lat,
-                    swlng: bounds.southWest.lng,
-                },
+            const response = await rest().post("query", {
+                limit,
+                bounds: [
+                    bounds.northEast.lat, bounds.northEast.lng,
+                    bounds.southWest.lat, bounds.southWest.lng,
+                ],
             });
 
             const potholes = response.data.potholes.map(potholeFromAny);

@@ -259,7 +259,7 @@
                 const {truncated} = await debouncedDoFetchPotholes({
                     northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
                     southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
-                });
+                }, 100);
 
                 if(truncated) {
                     this.zoomSnackbar = true;

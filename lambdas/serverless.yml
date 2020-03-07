@@ -16,7 +16,12 @@ functions:
     events:
       - http:
           path: query
-          method: get
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+            allowCredentials: false
 
 plugins:
   - serverless-dotenv-plugin

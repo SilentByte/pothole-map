@@ -21,7 +21,7 @@ from typing import (
     Union,
 )
 
-from potholemap import httpstatus
+from potholemap import httpstatus, schemas
 from potholemap.collections import CaseInsensitiveDict
 
 log = logging.getLogger(__name__)
@@ -74,6 +74,10 @@ class Context:
 
 class GatewayException(Exception):
     status_code = httpstatus.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+class BadRequestException(GatewayException):
+    status_code = httpstatus.HTTP_400_BAD_REQUEST
 
 
 class Response:
@@ -150,6 +154,7 @@ class Lambda:
                     'statusCode': e.status_code,
                     'body': None,
                 }
+
             except:
                 log.exception('Unhandled exception')
                 return {
@@ -162,38 +167,30 @@ class Lambda:
 
 class QueryLambda(Lambda):
     @staticmethod
-    def _extract_bounds(query_params: CaseInsensitiveDict) -> Optional[Tuple[float, float, float, float]]:
-        nelat = query_params.get('nelat', None)
-        nelng = query_params.get('nelng', None)
-        swlat = query_params.get('swlat', None)
-        swlng = query_params.get('swlng', None)
-
-        if None in (nelat, nelng, swlat, swlng):
-            return None
-
+    def _parse_body(event: Event) -> Optional[dict]:
         try:
-            return float(nelat), float(nelng), float(swlat), float(swlng)
-        except ValueError:
+            return schemas.apply_schema(schemas.QuerySchema, event.body)
+        except schemas.ValidationError:
             return None
 
     def handle(self, event: Event, context: Context) -> Response:
-        bounds = QueryLambda._extract_bounds(event.query_params)
-        if bounds is None:
+        data = QueryLambda._parse_body(event)
+        if data is None:
             return JsonResponse(
                 status_code=httpstatus.HTTP_400_BAD_REQUEST,
-                data={'message': 'Query parameters (nelat, nelng, swlat, swlng) must be set correctly'},
+                data={'message': 'Invalid payload'},
             )
 
-        nelat, nelng, swlat, swlng = bounds
-        limit = 200
+        nelat, nelng, swlat, swlng = data['bounds']
+        limit = min(data['limit'], 100)
 
         # TODO: Implement as DynamoDB query.
         generator = Random(0)
         potholes = []
-        for i in range(100000):
+        for i in range(10000):
             coordinates = [
-                -31.958279460482014 + (generator.random() * 5 - 2.5),
-                115.84404945373534 + (generator.random() * 5 - 2.5),
+                -31.958279460482014 + (generator.random() * 2 - 1),
+                115.84404945373534 + (generator.random() * 2 - 1),
             ]
 
             record = {
@@ -218,6 +215,8 @@ class QueryLambda(Lambda):
         return JsonResponse({
             'potholes': potholes,
             'truncated': len(potholes) > limit,
+        }, headers={
+            'Access-Control-Allow-Origin': '*',
         })
 
 
