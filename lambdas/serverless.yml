@@ -35,6 +35,7 @@ package:
     - htmlcov/**
     - .coverage
     - .env*
+    - docs/**
 
 custom:
   pythonRequirements:
