@@ -94,7 +94,7 @@ class Repo:
                        longitude
                 FROM pothole
                 WHERE geohash BETWEEN %(south_west)s AND %(north_east)s
-                ORDER BY id
+                ORDER BY random() -- TODO: Find better solution.
                 LIMIT %(limit)s
                 """, {
                     'north_east': north_east,
@@ -109,5 +109,5 @@ class Repo:
                 timestamp=p[2],
                 confidence=p[3],
                 coordinates=(p[4], p[5]),
-                photo_url=None,  # TODO: Generate URL based on S3 key.
+                photo_url=f'https://picsum.photos/seed/{p[0]}/1920/1080',  # TODO: Generate URL based on S3 key.
             ) for p in cursor.fetchall()])

@@ -257,7 +257,7 @@
 
                 const bounds = map.getBounds();
                 const {truncated} = await debouncedDoFetchPotholes({
-                    limit: 50,
+                    limit: 200,
                     bounds: {
                         northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
                         southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
