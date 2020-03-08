@@ -17,4 +17,5 @@ CREATE TABLE pothole
     photo_key   character varying(255)   NULL
 );
 
-CREATE INDEX CONCURRENTLY geohash_index ON pothole (geohash);
+CREATE INDEX CONCURRENTLY geohash_index ON pothole (geohash ASC NULLS LAST);
+CREATE INDEX CONCURRENTLY recorded_on_index ON pothole (recorded_on DESC NULLS LAST);
