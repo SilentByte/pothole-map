@@ -10,6 +10,19 @@ provider:
   region: us-east-1
   runtime: python3.7
 
+environment:
+  DEBUG: ${env:DEBUG}
+  PRODUCTION: ${env:PRODUCTION}
+
+  DB_HOST: ${env:DB_HOST}
+  DB_PORT: ${env:DB_PORT}
+  DB_NAME: ${env:DB_NAME}
+  DB_USER: ${env:DB_USER}
+  DB_PASSWORD: ${env:DB_PASSWORD}
+
+  QUERY_MAX_RESULT_COUNT: ${env:QUERY_MAX_RESULT_COUNT}
+  QUERY_DEFAULT_RESULT_COUNT: ${env:QUERY_DEFAULT_RESULT_COUNT}
+
 functions:
   query:
     handler: potholemap/lambdas.query_handler

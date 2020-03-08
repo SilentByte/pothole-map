@@ -5,12 +5,9 @@
 
 import json
 import logging
-import pytz
-import geohash2
 
 from uuid import UUID
-from random import Random
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from abc import abstractmethod
 from typing import (
@@ -21,7 +18,13 @@ from typing import (
     Union,
 )
 
-from potholemap import httpstatus, schemas
+from potholemap import (
+    httpstatus,
+    schemas,
+    settings,
+)
+
+from potholemap.db import Repo
 from potholemap.collections import CaseInsensitiveDict
 
 log = logging.getLogger(__name__)
@@ -181,39 +184,18 @@ class QueryLambda(Lambda):
                 data={'message': 'Invalid payload'},
             )
 
-        nelat, nelng, swlat, swlng = data['bounds']
-        limit = min(data['limit'], 100)
+        repo = Repo(
+            host=settings.DB_HOST,
+            database=settings.DB_NAME,
+            user=settings.DB_USER,
+            password=settings.DB_PASSWORD,
+        )
 
-        # TODO: Implement as DynamoDB query.
-        generator = Random(0)
-        potholes = []
-        for i in range(10000):
-            coordinates = [
-                -31.958279460482014 + (generator.random() * 2 - 1),
-                115.84404945373534 + (generator.random() * 2 - 1),
-            ]
-
-            record = {
-                "id": UUID(int=generator.getrandbits(128)),
-                "deviceName": f'Test Device {i}',
-                "timestamp": datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(seconds=i * 10),
-                "confidence": generator.random(),
-                "coordinates": coordinates,
-                "geohash": geohash2.encode(coordinates[0], coordinates[1]),
-                "photoUrl": f'https://picsum.photos/seed/05/1920/1080?random={i}'
-            }
-
-            potholes.append(record)
-
-        lower = geohash2.encode(swlat, swlng)
-        upper = geohash2.encode(nelat, nelng)
-
-        potholes = list(filter(lambda p: lower <= p['geohash'] <= upper, potholes))
-        potholes = sorted(potholes, key=lambda p: p['id'])
-        potholes = potholes[:limit + 1]
+        limit = min(data.get('limit', settings.QUERY_DEFAULT_RESULT_COUNT), settings.QUERY_MAX_RESULT_COUNT)
+        potholes = repo.query_potholes_within_bounds(data['bounds'], limit + 1)
 
         return JsonResponse({
-            'potholes': potholes,
+            'potholes': schemas.dump_schema_list(schemas.PotholeSchema, potholes),
             'truncated': len(potholes) > limit,
         }, headers={
             'Access-Control-Allow-Origin': '*',

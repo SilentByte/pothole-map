@@ -103,7 +103,9 @@
         }
 
         onAddressSelected(place: IPlace) {
-            appState.doCenterOnLocation(place.coordinates);
+            appState.doCenterOnLocation({
+                center: place.coordinates,
+            });
         }
     }
 </script>

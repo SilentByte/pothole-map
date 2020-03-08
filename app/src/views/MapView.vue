@@ -257,9 +257,12 @@
 
                 const bounds = map.getBounds();
                 const {truncated} = await debouncedDoFetchPotholes({
-                    northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
-                    southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
-                }, 100);
+                    limit: 50,
+                    bounds: {
+                        northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
+                        southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),
+                    },
+                });
 
                 if(truncated) {
                     this.zoomSnackbar = true;

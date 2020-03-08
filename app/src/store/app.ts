@@ -26,11 +26,11 @@ function coordinatesFromAny(data: any): [number, number] {
 function potholeFromAny(data: any): IPothole {
     return {
         id: ensure.uuid(data.id),
-        deviceName: ensure.string(data.deviceName),
+        deviceName: ensure.string(data.device_name),
         timestamp: ensure.date(data.timestamp),
         confidence: ensure.number(data.confidence),
         coordinates: coordinatesFromAny(data.coordinates),
-        photoUrl: ensure.optional(data.photoUrl, ensure.string),
+        photoUrl: ensure.optional(data.photo_url, ensure.string),
     };
 }
 
@@ -105,21 +105,24 @@ export class AppModule extends VuexModule {
     }
 
     @Action({rawError: true})
-    doCenterOnLocation(center: IPoint) {
-        this.setMapCenter(center);
+    doCenterOnLocation(payload: { center: IPoint }) {
+        this.setMapCenter(payload.center);
         this.setMapZoom(15);
-        this.setUserMarker(center);
+        this.setUserMarker(payload.center);
     }
 
     @Action({rawError: true})
-    async doFetchPotholes(bounds: IBounds, limit: number): Promise<{ truncated: boolean }> {
+    async doFetchPotholes(payload: {
+        bounds: IBounds;
+        limit: number;
+    }): Promise<{ truncated: boolean }> {
         try {
             this.setMapBusy(true);
             const response = await rest().post("query", {
-                limit,
+                limit: payload.limit,
                 bounds: [
-                    bounds.northEast.lat, bounds.northEast.lng,
-                    bounds.southWest.lat, bounds.southWest.lng,
+                    payload.bounds.northEast.lat, payload.bounds.northEast.lng,
+                    payload.bounds.southWest.lat, payload.bounds.southWest.lng,
                 ],
             });
 

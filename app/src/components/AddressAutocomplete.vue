@@ -78,7 +78,6 @@
             }, (predictions: any[], status: any) => {
                 this.pending = false;
                 if(status !== google.maps.places.PlacesServiceStatus.OK) {
-                    console.error(status);
                     return;
                 }
 
@@ -104,7 +103,6 @@
                 this.sessionToken = new google.maps.places.AutocompleteSessionToken();
 
                 if(status !== google.maps.places.PlacesServiceStatus.OK) {
-                    console.error(status);
                     return;
                 }
 
