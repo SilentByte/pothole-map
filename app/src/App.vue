@@ -10,10 +10,15 @@
 
             <v-app-bar-nav-icon @click="drawer = !drawer" />
 
-            <span class="title ml-3 mr-5 text-uppercase">Pothole<span class="font-weight-light">Map</span></span>
+            <span v-if="!$vuetify.breakpoint.xs || !addressFocused"
+                  class="title ml-3 mr-5 text-uppercase">
+                Pothole<span class="font-weight-light">Map</span>
+            </span>
 
             <AddressAutocomplete :bias-coordinates="mapCenter"
-                                 @address-selected="onAddressSelected" />
+                                 @address-selected="onAddressSelected"
+                                 @focus="addressFocused = true"
+                                 @blur="addressFocused = false" />
 
             <v-btn icon
                    :loading="userLocationPending"
@@ -89,6 +94,7 @@
     })
     export default class App extends Vue {
         drawer = null;
+        addressFocused = false;
 
         get userLocationPending() {
             return appState.mapUserLocationPending;

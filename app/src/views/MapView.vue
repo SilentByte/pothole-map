@@ -148,6 +148,11 @@
                         </v-row>
                     </template>
                 </v-img>
+                <v-btn dark icon
+                       absolute top right
+                       @click="photoPreview = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
             </v-card>
         </v-dialog>
     </v-container>
@@ -257,7 +262,7 @@
 
                 const bounds = map.getBounds();
                 const {truncated} = await debouncedDoFetchPotholes({
-                    limit: 200,
+                    limit: 100,
                     bounds: {
                         northEast: geo.point(bounds.getNorthEast().lat(), bounds.getNorthEast().lng()),
                         southWest: geo.point(bounds.getSouthWest().lat(), bounds.getSouthWest().lng()),

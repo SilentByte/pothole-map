@@ -5,7 +5,8 @@
 
 <!--suppress JSUnresolvedVariable, ES6ModulesDependencies -->
 <template>
-    <v-autocomplete solo-inverted
+    <v-autocomplete ref="autocomplete"
+                    solo-inverted
                     auto-select-first
                     no-filter
                     hide-no-data
@@ -22,7 +23,9 @@
                     :append-icon="null"
                     :items="items"
                     :search-input.sync="search"
-                    @change="onChangePlace" />
+                    @change="onChangePlace"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')" />
 </template>
 
 <!--suppress TypeScriptUnresolvedVariable, TypeScriptUnresolvedFunction -->
@@ -114,6 +117,7 @@
                 };
 
                 this.$emit("address-selected", place);
+                (document as any).activeElement.blur();
             });
         }
 
