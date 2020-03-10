@@ -78,7 +78,8 @@
                                       @click="onPreviewPhoto">
                                 <v-img v-if="currentPothole.photoUrl"
                                        :key="currentPothole.id"
-                                       :src="currentPothole.photoUrl">
+                                       :src="currentPothole.photoUrl"
+                                       @error="currentPothole.photoUrl = undefined">
                                     <template v-slot:placeholder>
                                         <v-row class="fill-height ma-0"
                                                align="center"
