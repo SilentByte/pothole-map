@@ -5,8 +5,10 @@
 
 import json
 import logging
+import base64
+import boto3
 
-from uuid import UUID
+from uuid import UUID, uuid4
 from datetime import datetime
 
 from abc import abstractmethod
@@ -14,7 +16,6 @@ from typing import (
     Any,
     Dict,
     Optional,
-    Tuple,
     Union,
 )
 
@@ -47,6 +48,10 @@ def _jsonify(data: Union[dict, list]) -> str:
         sort_keys=True,
         cls=ExtendedEncoder,
     )
+
+
+def _generate_s3_photo_key(id: UUID) -> str:
+    return settings.PHOTO_KEY_PREFIX + str(id)
 
 
 class Event:
@@ -191,8 +196,19 @@ class QueryLambda(Lambda):
             password=settings.DB_PASSWORD,
         )
 
+        s3 = boto3.client('s3')
         limit = min(data.get('limit', settings.QUERY_DEFAULT_RESULT_COUNT), settings.QUERY_MAX_RESULT_COUNT)
-        potholes = repo.query_potholes_within_bounds(data['bounds'], limit + 1)
+        potholes = repo.query_potholes_within_bounds(
+            data['bounds'], limit + 1,
+            lambda id: s3.generate_presigned_url(
+                'get_object',
+                Params={
+                    'Bucket': settings.PHOTO_BUCKET_NAME,
+                    'Key': _generate_s3_photo_key(id),
+                },
+                ExpiresIn=60 * 60 * 24,
+            )
+        )
 
         return JsonResponse({
             'potholes': schemas.dump_schema_list(schemas.PotholeSchema, potholes),
@@ -200,6 +216,34 @@ class QueryLambda(Lambda):
         }, headers={
             'Access-Control-Allow-Origin': '*',
         })
+
+
+def queue_handler(event, _context) -> None:
+    record_id = uuid4()
+    pothole_data = schemas.apply_schema(schemas.PotholeEventSchema, event)
+
+    s3 = boto3.client('s3')
+    s3.put_object(
+        # TODO: Configure properly for existing setup.
+        Bucket=settings.PHOTO_BUCKET_NAME,
+        Key=_generate_s3_photo_key(record_id),
+        Body=base64.b64decode(pothole_data['photo_data']),
+    )
+
+    repo = Repo(
+        host=settings.DB_HOST,
+        database=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+    )
+
+    repo.insert_pothole(
+        id=record_id,
+        device_name=pothole_data['device_name'],
+        timestamp=pothole_data['timestamp'],
+        confidence=pothole_data['confidence'],
+        coordinates=pothole_data['coordinates'],
+    )
 
 
 query_handler = QueryLambda().bind()

@@ -13,8 +13,7 @@ CREATE TABLE pothole
     confidence  double precision         NOT NULL,
     latitude    double precision         NOT NULL,
     longitude   double precision         NOT NULL,
-    geohash     character(12)            NOT NULL,
-    photo_key   character varying(255)   NULL
+    geohash     character(12)            NOT NULL
 );
 
 CREATE INDEX CONCURRENTLY geohash_index ON pothole (geohash ASC NULLS LAST);

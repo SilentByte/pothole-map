@@ -36,6 +36,9 @@ functions:
               - Content-Type
             allowCredentials: false
 
+  queue:
+    handler: potholemap/lambdas.queue_handler
+
 plugins:
   - serverless-dotenv-plugin
   - serverless-offline

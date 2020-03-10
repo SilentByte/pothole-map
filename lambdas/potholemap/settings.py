@@ -33,6 +33,9 @@ PRODUCTION = truthy(required('PRODUCTION'))
 QUERY_DEFAULT_RESULT_COUNT = int(required('QUERY_DEFAULT_RESULT_COUNT'))
 QUERY_MAX_RESULT_COUNT = int(required('QUERY_MAX_RESULT_COUNT'))
 
+PHOTO_BUCKET_NAME = required('PHOTO_BUCKET_NAME')
+PHOTO_KEY_PREFIX = optional('PHOTO_KEY_PREFIX', 'potholes/')
+
 if DEBUG and PRODUCTION:
     raise ValueError('DEBUG and PRODUCTION cannot be true simultaneously')
 

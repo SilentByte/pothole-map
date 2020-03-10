@@ -13,4 +13,4 @@ htmlcov/
 
 .env*
 db.sqlite
-
+test_event_data.json

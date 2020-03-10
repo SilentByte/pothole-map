@@ -8,12 +8,13 @@ import psycopg2
 import geohash2
 
 from typing import (
-    Tuple,
+    Callable,
     List,
     Optional,
+    Tuple,
 )
 
-from uuid import uuid4
+from uuid import UUID
 from datetime import datetime
 
 
@@ -51,7 +52,8 @@ class Repo:
             password=password,
         )
 
-    def insert_pothole(self, pothole: Pothole) -> None:
+    def insert_pothole(self, id: UUID, device_name: str, timestamp: datetime,
+                       confidence: float, coordinates: Tuple[float, float]) -> None:
         with self.connection.cursor() as cursor:
             cursor.execute(
                 """
@@ -66,20 +68,21 @@ class Repo:
                     geohash
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                  """, (
-                    str(uuid4()),
-                    pothole.device_name,
+                    id,
+                    device_name,
                     _utc_now(),
-                    pothole.timestamp,
-                    pothole.confidence,
-                    pothole.coordinates[0],
-                    pothole.coordinates[1],
-                    geohash2.encode(pothole.coordinates[0], pothole.coordinates[1]),
+                    timestamp,
+                    confidence,
+                    coordinates[0],
+                    coordinates[1],
+                    geohash2.encode(coordinates[0], coordinates[1]),
                 )
             )
 
             self.connection.commit()
 
-    def query_potholes_within_bounds(self, bounds: Tuple[float, float, float, float], limit: int) -> List[Pothole]:
+    def query_potholes_within_bounds(self, bounds: Tuple[float, float, float, float], limit: int,
+                                     photo_url_generator: Callable[[UUID], str]) -> List[Pothole]:
         north_east = geohash2.encode(bounds[0], bounds[1])
         south_west = geohash2.encode(bounds[2], bounds[3])
 
@@ -109,5 +112,5 @@ class Repo:
                 timestamp=p[2],
                 confidence=p[3],
                 coordinates=(p[4], p[5]),
-                photo_url=f'https://picsum.photos/seed/{p[0]}/1920/1080',  # TODO: Generate URL based on S3 key.
+                photo_url=photo_url_generator(p[0]),
             ) for p in cursor.fetchall()])
