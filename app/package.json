@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "deploy": "vue-cli-service build && firebase deploy",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
