@@ -30,14 +30,16 @@ def required(name):
 DEBUG = truthy(required('DEBUG'))
 PRODUCTION = truthy(required('PRODUCTION'))
 
+if DEBUG and PRODUCTION:
+    raise ValueError('DEBUG and PRODUCTION cannot be true simultaneously')
+
 QUERY_DEFAULT_RESULT_COUNT = int(required('QUERY_DEFAULT_RESULT_COUNT'))
 QUERY_MAX_RESULT_COUNT = int(required('QUERY_MAX_RESULT_COUNT'))
 
 PHOTO_BUCKET_NAME = required('PHOTO_BUCKET_NAME')
 PHOTO_KEY_PREFIX = optional('PHOTO_KEY_PREFIX', 'potholes/')
 
-if DEBUG and PRODUCTION:
-    raise ValueError('DEBUG and PRODUCTION cannot be true simultaneously')
+ACCESS_CONTROL_ALLOW_ORIGIN = required('ACCESS_CONTROL_ALLOW_ORIGIN')
 
 DB_NAME = required('DB_NAME')
 DB_USER = required('DB_USER')

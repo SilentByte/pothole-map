@@ -214,7 +214,7 @@ class QueryLambda(Lambda):
             'potholes': schemas.dump_schema_list(schemas.PotholeSchema, potholes),
             'truncated': len(potholes) > limit,
         }, headers={
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': settings.ACCESS_CONTROL_ALLOW_ORIGIN,
         })
 
 
