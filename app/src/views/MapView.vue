@@ -117,7 +117,10 @@
                                      class="text-truncate">
                                     Unknown Location
                                 </div>
-                                <div v-else class="text-truncate">
+                                <div v-else
+                                     class="text-truncate"
+                                     style="margin-right: 60px"
+                                     :title="currentPothole.resolvedAddress">
                                     {{ currentPothole.resolvedAddress }}
                                 </div>
                             </v-card-title>
@@ -127,7 +130,8 @@
                                 {{ currentPothole.coordinates[0].toFixed(6) }},
                                 {{ currentPothole.coordinates[1].toFixed(6) }}
                             </v-card-subtitle>
-                            <v-card-text class="pb-1">
+
+                            <v-card-text class="pb-1 subtitle-1">
                                 <strong>{{ currentPothole.deviceName }}</strong>,
                                 {{ (currentPothole.confidence * 100).toFixed(0) }}%,
                                 {{ currentPothole.timestamp.toLocaleString() }}
@@ -136,7 +140,7 @@
 
                         <v-spacer />
 
-                        <v-btn icon
+                        <v-btn icon absolute right
                                color="primary"
                                class="ma-2"
                                @click="sheet = false">
