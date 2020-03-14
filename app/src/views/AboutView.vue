@@ -105,6 +105,21 @@
                 </v-btn>
             </v-flex>
         </v-layout>
+
+        <v-footer absolute padless>
+            <v-card flat tile
+                    width="100%"
+                    class="primary">
+                <v-card-text class="white--text">
+                    Copyright &copy; {{ new Date().getFullYear() }} by
+                    <a href="https://silentbyte.com"
+                       target="_blank"
+                       style="color: white; font-weight: bold; text-decoration: none">
+                        SilentByte
+                    </a>
+                </v-card-text>
+            </v-card>
+        </v-footer>
     </v-container>
 </template>
 
@@ -146,6 +161,10 @@
 
         .twitter-feed {
             margin: 3em 0;
+        }
+
+        .footer {
+            margin-top: 3em !important;
         }
     }
 </style>
