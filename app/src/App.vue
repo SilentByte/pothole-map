@@ -33,12 +33,20 @@
                              v-model="drawer">
             <v-layout column fill-height>
                 <v-list nav dense>
-                    <v-list-item link>
+                    <v-list-item link exact :to="{ name: 'MapView' }">
                         <v-list-item-icon>
                             <v-icon>mdi-map-marker</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>Pothole Map</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item link :to="{ name: 'AboutView' }">
+                        <v-list-item-icon>
+                            <v-icon>mdi-emoticon</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>What's This?</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
@@ -118,6 +126,6 @@
 
 <style lang="scss">
     html {
-        overflow-y: hidden;
+        overflow-y: auto;
     }
 </style>

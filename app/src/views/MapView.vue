@@ -167,6 +167,7 @@
         Component,
         Vue,
     } from "vue-property-decorator";
+
     import { getModule } from "vuex-module-decorators";
 
     import * as geo from "@/modules/geo";

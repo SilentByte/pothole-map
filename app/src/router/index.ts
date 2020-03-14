@@ -5,6 +5,7 @@
 
 import Vue from "vue";
 import VueRouter from "vue-router";
+
 import MapView from "@/views/MapView.vue";
 
 Vue.use(VueRouter);
@@ -14,6 +15,11 @@ const routes = [
         path: "/:options(@[\\-0-9\\.\\,]+z)?",
         name: "MapView",
         component: MapView,
+    },
+    {
+        path: "/about",
+        name: "AboutView",
+        component: () => import(/* webpackChunkName: "about" */ "@/views/AboutView.vue"),
     },
     {
         path: "*",
