@@ -68,7 +68,7 @@ class Repo:
                     geohash
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                  """, (
-                    id,
+                    str(id),
                     device_name,
                     _utc_now(),
                     timestamp,

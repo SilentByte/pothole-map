@@ -31,13 +31,22 @@ functions:
           path: query
           method: post
           cors:
-            origin: '*'
+            origin: ${env:ACCESS_CONTROL_ALLOW_ORIGIN}
             headers:
               - Content-Type
             allowCredentials: false
 
-  queue:
-    handler: potholemap/lambdas.queue_handler
+  upload:
+      handler: potholemap/lambdas.upload_handler
+      events:
+        - http:
+            path: upload
+            method: post
+            cors:
+              origin: ${env:ACCESS_CONTROL_ALLOW_ORIGIN}
+              headers:
+                - Content-Type
+              allowCredentials: false
 
 plugins:
   - serverless-dotenv-plugin

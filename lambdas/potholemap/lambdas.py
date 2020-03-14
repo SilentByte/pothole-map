@@ -218,32 +218,52 @@ class QueryLambda(Lambda):
         })
 
 
-def queue_handler(event, _context) -> None:
-    record_id = uuid4()
-    pothole_data = schemas.apply_schema(schemas.PotholeEventSchema, event)
+class UploadLambda(Lambda):
+    @staticmethod
+    def _parse_body(event: Event) -> Optional[dict]:
+        try:
+            return schemas.apply_schema(schemas.PotholeUploadSchema, event.body)
+        except schemas.ValidationError:
+            log.exception("Invalid payload received")
+            return None
 
-    s3 = boto3.client('s3')
-    s3.put_object(
-        # TODO: Configure properly for existing setup.
-        Bucket=settings.PHOTO_BUCKET_NAME,
-        Key=_generate_s3_photo_key(record_id),
-        Body=base64.b64decode(pothole_data['photo_data']),
-    )
+    def handle(self, event: Event, context: Context) -> Response:
+        data = UploadLambda._parse_body(event)
+        if data is None:
+            return JsonResponse(
+                status_code=httpstatus.HTTP_400_BAD_REQUEST,
+                data={'message': 'Invalid payload'},
+            )
 
-    repo = Repo(
-        host=settings.DB_HOST,
-        database=settings.DB_NAME,
-        user=settings.DB_USER,
-        password=settings.DB_PASSWORD,
-    )
+        record_id = uuid4()
 
-    repo.insert_pothole(
-        id=record_id,
-        device_name=pothole_data['device_name'],
-        timestamp=pothole_data['timestamp'],
-        confidence=pothole_data['confidence'],
-        coordinates=pothole_data['coordinates'],
-    )
+        s3 = boto3.client('s3')
+        s3.put_object(
+            Bucket=settings.PHOTO_BUCKET_NAME,
+            Key=_generate_s3_photo_key(record_id),
+            Body=base64.b64decode(data['photo_data']),
+            ContentType='image/jpeg',
+        )
+
+        repo = Repo(
+            host=settings.DB_HOST,
+            database=settings.DB_NAME,
+            user=settings.DB_USER,
+            password=settings.DB_PASSWORD,
+        )
+
+        repo.insert_pothole(
+            id=record_id,
+            device_name=data['device_name'],
+            timestamp=data['timestamp'],
+            confidence=data['confidence'],
+            coordinates=data['coordinates'],
+        )
+
+        return JsonResponse({}, headers={
+            'Access-Control-Allow-Origin': settings.ACCESS_CONTROL_ALLOW_ORIGIN,
+        })
 
 
 query_handler = QueryLambda().bind()
+upload_handler = UploadLambda().bind()

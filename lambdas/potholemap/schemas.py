@@ -39,7 +39,7 @@ class PotholeSchema(Schema):
     photo_url = fields.String(required=True)
 
 
-class PotholeEventSchema(Schema):
+class PotholeUploadSchema(Schema):
     device_name = fields.String(required=True)
     timestamp = fields.DateTime(required=True)
     confidence = fields.Float(required=True)
