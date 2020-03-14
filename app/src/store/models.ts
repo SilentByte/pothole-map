@@ -10,4 +10,5 @@ export interface IPothole {
     confidence: number;
     coordinates: [number, number];
     photoUrl?: string;
+    resolvedAddress?: string | undefined | null;
 }

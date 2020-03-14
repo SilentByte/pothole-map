@@ -70,7 +70,8 @@
                         v-model="sheet">
             <v-sheet>
                 <v-card>
-                    <v-layout d-flex flex-no-wrap>
+                    <v-layout d-flex flex-no-wrap
+                              :column="$vuetify.breakpoint.xs">
                         <v-hover v-slot:default="{ hover }">
                             <v-avatar flat tile
                                       size="150"
@@ -106,17 +107,32 @@
                             </v-avatar>
                         </v-hover>
 
-                        <div>
-                            <v-card-title class="headline">
+                        <v-layout column>
+                            <v-card-title class="headline text-truncate">
+                                <div v-if="currentPothole.resolvedAddress === undefined"
+                                     class="text-truncate">
+                                    <v-progress-circular indeterminate color="primary" />
+                                </div>
+                                <div v-else-if="currentPothole.resolvedAddress === null"
+                                     class="text-truncate">
+                                    Unknown Location
+                                </div>
+                                <div v-else class="text-truncate">
+                                    {{ currentPothole.resolvedAddress }}
+                                </div>
+                            </v-card-title>
+
+                            <v-card-subtitle class="pb-1 caption">
+                                <v-icon x-small>mdi-map-marker-radius</v-icon>
                                 {{ currentPothole.coordinates[0].toFixed(6) }},
                                 {{ currentPothole.coordinates[1].toFixed(6) }}
-                            </v-card-title>
-                            <v-card-subtitle class="pb-1">
-                                {{ currentPothole.deviceName }},
+                            </v-card-subtitle>
+                            <v-card-text class="pb-1">
+                                <strong>{{ currentPothole.deviceName }}</strong>,
                                 {{ (currentPothole.confidence * 100).toFixed(0) }}%,
                                 {{ currentPothole.timestamp.toLocaleString() }}
-                            </v-card-subtitle>
-                        </div>
+                            </v-card-text>
+                        </v-layout>
 
                         <v-spacer />
 
@@ -161,6 +177,8 @@
 
 <!--suppress TypeScriptUnresolvedVariable, TypeScriptUnresolvedFunction -->
 <script lang="ts">
+    /* global google */
+
     import _ from "lodash";
 
     import {
@@ -301,6 +319,19 @@
             postpone(() => {
                 this.sheet = true;
                 this.currentPothole = appState.potholes.find(p => p.id === markerId) as IPothole;
+                new google.maps.Geocoder().geocode({
+                        location: {
+                            lat: this.currentPothole.coordinates[0],
+                            lng: this.currentPothole.coordinates[1],
+                        },
+                    },
+                    (results: any, status: any) => {
+                        if(status !== "OK" || !results[0]) {
+                            this.$set(this.currentPothole, "resolvedAddress", null);
+                        } else {
+                            this.$set(this.currentPothole, "resolvedAddress", results[0].formatted_address);
+                        }
+                    });
             });
         }
 
