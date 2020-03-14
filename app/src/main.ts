@@ -9,6 +9,7 @@ import router from "@/router";
 import store from "@/store";
 import vuetify from "@/plugins/vuetify";
 import "@/plugins/vue-google-maps";
+import "@/plugins/vue-gtag";
 
 import App from "@/App.vue";
 

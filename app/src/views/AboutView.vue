@@ -132,7 +132,12 @@
     @Component
     export default class AboutView extends Vue {
         mounted() {
-            this.$nextTick(() => (window as any).twttr.widgets.load());
+            // Send simple ping without coordinates for privacy reasons.
+            this.$gtag.pageview({
+                "page_title": "AboutView",
+                "page_path": "/about",
+                "page_location": "/",
+            });
         }
     }
 </script>

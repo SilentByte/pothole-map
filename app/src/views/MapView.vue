@@ -311,6 +311,13 @@
         }
 
         mounted() {
+            // Send simple ping without coordinates for privacy reasons.
+            this.$gtag.pageview({
+                "page_title": "MapView",
+                "page_path": "/",
+                "page_location": "/",
+            });
+
             if(this.$route.params.options) {
                 const options = geo.extractMapViewOptions(this.$route.params.options);
                 if(options) {
