@@ -53,7 +53,7 @@
                          :position="userMarker.coordinates"
                          :icon="userMarker.iconUrl" />
 
-            <gmap-cluster :minimum-cluster-size="5"
+            <gmap-cluster :minimum-cluster-size="20"
                           :zoom-on-click="true"
                           :styles="clusterStyles">
                 <gmap-marker v-for="m in markers"
