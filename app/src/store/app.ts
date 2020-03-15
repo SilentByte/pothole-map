@@ -107,7 +107,7 @@ export class AppModule extends VuexModule {
     @Action({rawError: true})
     doCenterOnLocation(payload: { center: IPoint }) {
         this.setMapCenter(payload.center);
-        this.setMapZoom(15);
+        this.setMapZoom(12);
         this.setUserMarker(payload.center);
     }
 

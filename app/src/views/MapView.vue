@@ -175,7 +175,6 @@
                 <v-img v-if="currentPothole.photoUrl"
                        contain
                        :max-height="$vuetify.breakpoint.name === 'sm' ? '100%' : '80%'"
-                       :key="currentPothole.id"
                        :src="currentPothole.photoUrl"
                        @click="photoPreview = false">
                     <template v-slot:placeholder>
@@ -343,22 +342,29 @@
         }
 
         onMarkerClick(markerId: string) {
+            if(this.sheet && markerId === this.currentPothole.id) {
+                return;
+            }
+
             postpone(() => {
                 this.sheet = true;
                 this.currentPothole = appState.potholes.find(p => p.id === markerId) as IPothole;
-                new google.maps.Geocoder().geocode({
-                        location: {
-                            lat: this.currentPothole.coordinates[0],
-                            lng: this.currentPothole.coordinates[1],
+
+                if(this.currentPothole.resolvedAddress === undefined) {
+                    new google.maps.Geocoder().geocode({
+                            location: {
+                                lat: this.currentPothole.coordinates[0],
+                                lng: this.currentPothole.coordinates[1],
+                            },
                         },
-                    },
-                    (results: any, status: any) => {
-                        if(status !== "OK" || !results[0]) {
-                            this.$set(this.currentPothole, "resolvedAddress", null);
-                        } else {
-                            this.$set(this.currentPothole, "resolvedAddress", results[0].formatted_address);
-                        }
-                    });
+                        (results: any, status: any) => {
+                            if(status !== "OK" || !results[0]) {
+                                this.$set(this.currentPothole, "resolvedAddress", null);
+                            } else {
+                                this.$set(this.currentPothole, "resolvedAddress", results[0].formatted_address);
+                            }
+                        });
+                }
             });
         }
 
