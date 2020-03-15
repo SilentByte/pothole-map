@@ -126,15 +126,23 @@
                             </v-card-title>
 
                             <v-card-subtitle class="pb-1 caption">
-                                <v-icon x-small>mdi-map-marker-radius</v-icon>
-                                {{ currentPothole.coordinates[0].toFixed(6) }},
-                                {{ currentPothole.coordinates[1].toFixed(6) }}
+                                <span class="mr-2">
+                                    <v-icon x-small>mdi-map-marker-radius</v-icon>
+                                    {{ currentPothole.coordinates[0].toFixed(6) }},
+                                    {{ currentPothole.coordinates[1].toFixed(6) }}
+                                </span>
+
+                                <span>
+                                    <v-icon x-small>mdi-calendar-clock</v-icon>
+                                    {{ currentPothole.timestamp.toLocaleString() }}
+                                </span>
                             </v-card-subtitle>
 
                             <v-card-text class="pb-1 subtitle-1">
-                                <strong>{{ currentPothole.deviceName }}</strong>,
-                                {{ (currentPothole.confidence * 100).toFixed(0) }}%,
-                                {{ currentPothole.timestamp.toLocaleString() }}
+                                Reported by
+                                <strong>{{ currentPothole.deviceName }}</strong>
+                                with a confidence of
+                                <strong>{{ currentPothole.confidence.toFixed(4) }}</strong>.
                             </v-card-text>
                         </v-layout>
 
