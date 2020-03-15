@@ -144,6 +144,16 @@
                                 with a confidence of
                                 <strong>{{ currentPothole.confidence.toFixed(4) }}</strong>.
                             </v-card-text>
+
+                            <v-card-text class="text-right">
+                                <v-btn small dark
+                                       color="#dd4b3e"
+                                       :href="getGoogleMapsLink(currentPothole)"
+                                       target="_blank">
+                                    <v-icon left>mdi-google-maps</v-icon>
+                                    Google Maps
+                                </v-btn>
+                            </v-card-text>
                         </v-layout>
 
                         <v-spacer />
@@ -280,6 +290,11 @@
                 coordinates: geo.point(p.coordinates[0], p.coordinates[1]),
                 iconUrl: "/images/markers/pothole.svg",
             }));
+        }
+
+        getGoogleMapsLink(pothole: IPothole) {
+            const [lat, lng] = pothole.coordinates;
+            return `https://www.google.com/maps/place/${lat},${lng}`;
         }
 
         async onIdle() {
