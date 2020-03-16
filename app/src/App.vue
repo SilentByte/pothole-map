@@ -113,10 +113,12 @@
         }
 
         onCenterOnUserLocation() {
+            this.$router.push({name: "MapView"});
             appState.doCenterOnUserLocation();
         }
 
         onAddressSelected(place: IPlace) {
+            this.$router.push({name: "MapView"});
             appState.doCenterOnLocation({
                 center: place.coordinates,
             });
