@@ -1,12 +1,5 @@
-<<<<<<< HEAD
+
 ![logo](pothole-map.png)
-
-# Pothole AI
-=======
-# Pothole AI
-![logo](docs/logo.png)
->>>>>>> 8caf7d3ae932f976b110daed6d2fef7057f299d0
-
 Pothole AI was designed after looking at a dashcam and asking "What if we used Edge Analytics on a dashcam to map out
  where potholes were, so that local governments and communities knew where to focus their efforts?".
 
@@ -31,7 +24,7 @@ We believe that this solution is nessessary because a quick google of pothole le
 
 These articles are not an indication of a system that is working well.
 
-Some of the more serious concequences of potholes include:
+Some of the more serious consequences of potholes include:
 * Annual average cost to vehicles of $377 due to rough pavement
 * Of approximately 33,000 traffic fatalities each year, one-third involve poor road conditions.
 
@@ -98,8 +91,8 @@ Sequential(
   (1): Linear(in_features=1280, out_features=2, bias=True)
 )
 ```
-We used transfer learning to speed up the training process, freezing the intial weights of the imagenet trained model, 
-and trained only our classifier. We then progressivly unfroze more weight and trained at lower learning rates.
+We used transfer learning to speed up the training process, freezing the initial weights of the imagenet trained model, 
+and trained only our classifier. We then progressively unfroze more weight and trained at lower learning rates.
 
 Once we had our saved model, we used this to perform inference on the raspberry pi, to allow us to only send data when the predicted score reached above a custom theshhold to conserve bandwith.
 ### Raspberry Pi
@@ -216,7 +209,7 @@ Follow these steps to get the website ready for development and deployment.
 
 #### Building & Deployment
 
-*Be sure to check your AWS keys and `serverless.yml` before deployment as to not incure costs.*
+*Be sure to check your AWS keys and `serverless.yml` before deployment as to not incur costs.*
 
 *   Run the following commands to create a production build of the front-end app. The content of the resulting `dist/` folder can be uploaded onto any static site hosting provider. We're using [Firebase](https://firebase.google.com/).
     ```bash

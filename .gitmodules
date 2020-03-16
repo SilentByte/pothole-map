@@ -1,0 +1,3 @@
+[submodule "cameraai"]
+	path = cameraai
+	url = https://github.com/SrzStephen/Aicamera.git
