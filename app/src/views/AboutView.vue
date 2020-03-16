@@ -18,7 +18,7 @@
             <p>
                 <strong>Pothole AI</strong> is the backbone of the system and consists of a fleet of a Raspberry Pis
                 placed on the dashboard of regular cars. Using a camera &mdash; just like a dash cam &mdash; the road is
-                continuously scanned while the video frames are fed through an edge inference model powered by
+                continuously scanned while the video frames are fed through an inference model on the edge powered by
                 <a href="https://pytorch.org/"> PyTorch</a>. By recording imagery, along with GPS positions and
                 timestamps, our AI is able to assess the road quality and detect potholes.
             </p>
