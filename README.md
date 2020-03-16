@@ -6,14 +6,11 @@
 [![Pothole Map Status](https://img.shields.io/badge/status-live-00b20e.svg?style=for-the-badge)](https://pothole-map.silentbyte.com)
 
 
-# Pothole Map
+In the US, **one third** of the 33,000 annual traffic fatalities involve poor road conditions. This is unacceptable. We have designed and developed implemented Pothole AI/Map in an effort to leverage the power of the community through crowdsourcing.
 
-This repository contains the source code of Pothole Map, an interactive visualization of pothole locations that have been discovered by using artificial intelligence.
+Pothole AI is the backbone of the system and consists of a fleet of a Raspberry Pis placed on the dashboard of regular cars. Using a camera — just like a dash cam — the road is continuously scanned while the video frames are fed through an edge inference model powered by PyTorch. By recording imagery, along with GPS positions and timestamps, our AI is able to assess the road quality and detect potholes.
 
-
-# How Does it Work?
-
-TODO
+The recorded data is then collected, aggregated, and visualized by Pothole Map on the web. Of course, at the moment, the number of potholes is rather limited. However, we believe that, trough the magic of crowdsourcing, this data set has the potential to mature and become a valuable resource that improves road safety.
 
 
 # Development
@@ -26,8 +23,9 @@ TODO
 
 *   Set app environment variables by creating the file `.env.local` with the following variables. You'll need a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key).
     ```bash
-    VUE_APP_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_KEYS
     VUE_APP_API_URL=http://localhost:8888
+    VUE_APP_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_KEY
+    VUE_APP_GOOGLE_ANALYTICS_KEY=YOUR_GOOGLE_ANALYTICS_KEY
     ```
 
 *   Start app in development mode:
@@ -69,6 +67,8 @@ TODO
 
 
 # Building & Deployment
+
+*Be sure to check your AWS keys and `serverless.yml` before deployment as to not incure costs.*
 
 *   Run the following commands to create a production build of the front-end app. The content of the resulting `dist/` folder can be uploaded onto any static site hosting provider. We're using [Firebase](https://firebase.google.com/).
     ```bash
