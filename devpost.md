@@ -3,18 +3,14 @@
 # Pothole AI/Map
 
 Pothole AI was designed after looking at a dashcam and asking "What if we used Edge Analytics on a dashcam to map out
- where potholes were, so that local governments and communities knew where to focus their efforts?".
+ where potholes are, so that local governments and communities knew where to focus their efforts?".
 
 It consists of two parts: 
 
-* The Raspberry Pi based Camera using a Pytorch model to do edge inference of road quality 
+* The Raspberry Pi based Camera using a PyTorch model to do edge inference of road quality 
 * A website to aggregate readings and provide a full view of road conditions. 
 
-The idea behind these two components is to allow members of the community to automatically record and upload road 
-conditions, using edge inference to reduce the data sent across the network. This data could then be displayed on a
-website to give communities and local governments a geographic density of potholes to give them a better idea of
-where to spend their efforts, or to find and fix potholes that haven't been reported (because lets face it, who's actually
-reported a pothole to your local council?).
+The idea behind these two components is to allow members of the community to automatically record and upload road conditions using edge inference to reduce the data sent across the network. This data could then be displayed on a website to give communities and local governments a geographic density of potholes to give them a better idea of where to spend their efforts, or to find and fix potholes that haven't been reported (because lets face it, who's actually reported a pothole to your local council?).
 
 ![images of potholes](docs/exampleimage.png)
 
@@ -42,7 +38,7 @@ Some of the more serious concequences of potholes include:
 * [Optional: Raspberry Pi Heatsink](https://www.aliexpress.com/item/4000348002518.html?spm=a2g0o.productlist.0.0.51b05477h9g8bc)
 
 To build this system we used a Raspberry Pi 4B with a PiCam v2 and a Neo M8 GPS. The Raspberry Pi was responsible for
-getting the current GPS position, taking a picture, running the Pytorch model to get a confidence score of the road being bad.
+getting the current GPS position, taking a picture, running the PyTorch model to get a confidence score of the road being bad.
 
 
 This information was then sent to an AWS Lambda endpoint which in turn, stores the latitude, longitude, device name and image into a database.
@@ -77,7 +73,7 @@ which is an annotated dataset of labeled images of roads with an without pothole
 While this dataset initially is meant to be used for localisation (locating potholes in images), we chose to use it as 
 a classification dataset (image contains potholes or no potholes), [similar to Jian Yangs famous App](https://www.youtube.com/watch?v=pqTntG1RXSY).
 
-We used the Pytorch hosted MobileNet V2 network, which is pretrained on Imagenet. 
+We used the PyTorch hosted MobileNet V2 network, which is pretrained on Imagenet. 
 This is a convolutional neural network which is small enough to be used in embedded applications.
 
 We then cut off the classification layer to change it from trying to predict 1000 classes to just two.
@@ -97,12 +93,14 @@ We used transfer learning to speed up the training process, freezing the intial 
 and trained only our classifier. We then progressivly unfroze more weight and trained at lower learning rates.
 
 Once we had our saved model, we used this to perform inference on the raspberry pi, to allow us to only send data when the predicted score reached above a custom theshhold to conserve bandwith.
+
 ### Raspberry Pi
 The Raspberry Pi software is available as a command line tool that can be installed with either ```pip``` or ```conda```.
 
 It supports sending data to multiple endpoints (Aws SQS, HTTP Post, stdout or to a file) and is configurable via command line inputs and environment variables.
 
 You can view the help command by typing --help on any of the commands provided by the cameraai python package.
+
 #### CLI
 ```zsh
 Usage: aicamera [OPTIONS] COMMAND [ARGS]...
@@ -147,7 +145,7 @@ Most of these CLI options are also exposed as environment variables.
 # Serial port for GPS
 # GPS_SERIAL_PORT=/dev/ttyAMA0
 
-# Pytorch Model Location
+# PyTorch Model Location
 # MODEL_PATH=/opt/model
 ```
 
@@ -239,7 +237,7 @@ Give your pi user permission to access serial devices.
 usermod -a -G dialout pi
 ```
 
-#### Install Pytorch
+#### Install PyTorch
 ```
 git clone --recursive https://github.com/pytorch/pytorch
 cd pytorch
@@ -289,8 +287,8 @@ To use a different model on the raspberry pi, copy it to your Pi and refer to it
 
 ## What we ran into problems with
 ### No prebuilt python wheels on PiPi for Arm71
-Currently pipi does not have any Armv71 (Raspberry Pis current architecture) wheels for pytorch. 
-There are currently some issues compiling Pytorch from source on a Raspberry Pi [shout out to Minki-Kim95 for their post of how to fix this.](https://github.com/pytorch/pytorch/issues/26455.) Compiling pytorch on a Raspberry pi took 2+ hours.
+Currently pipi does not have any Armv71 (Raspberry Pis current architecture) wheels for PyTorch. 
+There are currently some issues compiling PyTorch from source on a Raspberry Pi [shout out to Minki-Kim95 for their post of how to fix this.](https://github.com/pytorch/pytorch/issues/26455.) Compiling PyTorch on a Raspberry pi took 2+ hours.
  
 The version of torchvision in PiPi for Arm71 is very old and does not support ```torchvision.models```. The latest version also had to be compiled from source (this was a lot faster).
 
@@ -313,6 +311,6 @@ Thanks to M.J Booysen for his data on pot holes.
 [1] S. Nienaber, M.J. Booysen, R.S. Kroon, “Detecting potholes using simple image processing techniques and real-world footage”, SATC, July 2015, Pretoria, South Africa.
 [2] S. Nienaber, R.S. Kroon, M.J. Booysen , “A Comparison of Low-Cost Monocular Vision Techniques for Pothole Distance Estimation”, IEEE CIVTS, December 2015, Cape Town, South Africa.
 
-Thanks to [Minki-Kim95](https://github.com/pytorch/pytorch/issues/26455.) for their answers on Github for how to compile Pytorch from source on a Raspberry Pi
+Thanks to [Minki-Kim95](https://github.com/pytorch/pytorch/issues/26455.) for their answers on Github for how to compile PyTorch from source on a Raspberry Pi
 
-Thanks to [ptrblck](https://discuss.pytorch.org/u/ptrblck/summary) for all the questions he has answered on the Pytorch forums. When we were looking at forum posts for things we didn't know he was the one who answered a lot of questions.
+Thanks to [ptrblck](https://discuss.pytorch.org/u/ptrblck/summary) for all the questions he has answered on the PyTorch forums. When we were looking at forum posts for things we didn't know he was the one who answered a lot of questions.
