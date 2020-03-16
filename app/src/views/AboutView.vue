@@ -10,35 +10,48 @@
         </h2>
 
         <div class="body-1">
-            TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO.
-            TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO.
-            TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO.
-            TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO.
-            TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO.
-            TODO. TODO. TODO. TODO. TODO. TODO. TODO. TODO.
+            <p>
+                In the US, <strong>one third</strong> of the 33,000 annual traffic fatalities involve poor road
+                conditions. This is unacceptable. We have designed and developed implemented <strong>
+                Pothole AI/Map</strong> in an effort to leverage the power of the community through crowdsourcing.
+            </p>
+            <p>
+                <strong>Pothole AI</strong> is the backbone of the system and consists of a fleet of a Raspberry Pis
+                placed on the dashboard of regular cars. Using a camera &mdash; just like a dash cam &mdash; the road is
+                continuously scanned while the video frames are fed through an edge inference model powered by
+                <a href="https://pytorch.org/"> PyTorch</a>. By recording imagery, along with GPS positions and
+                timestamps, our AI is able to assess the road quality and detect potholes.
+            </p>
+            <p>
+                The recorded data is then collected, aggregated, and visualized by <strong>Pothole Map</strong> on this
+                website. Of course, at the moment, the number of potholes is rather limited. However, we believe that,
+                trough the magic of crowdsourcing, this data set has the potential to mature and become a valuable
+                resource that improves road safety.
+            </p>
         </div>
 
+        <hr>
 
         <h2 class="mb-3 display-2 text-uppercase text-primary">
             #potholemap
         </h2>
 
         <v-layout row>
-            <v-flex xs12 sm4 px-3>
+            <v-flex my-4 xs12 sm4 px-3>
                 <v-btn x-large block dark color="#4267b2">
                     <v-icon left>mdi-facebook</v-icon>
                     Share
                 </v-btn>
             </v-flex>
 
-            <v-flex xs12 sm4 px-3>
+            <v-flex my-4 xs12 sm4 px-3>
                 <v-btn x-large block dark color="#1da1f2">
                     <v-icon left>mdi-twitter</v-icon>
                     Tweet
                 </v-btn>
             </v-flex>
 
-            <v-flex xs12 sm4 px-3>
+            <v-flex my-4 xs12 sm4 px-3>
                 <v-btn x-large block dark color="#424242">
                     <v-icon left>mdi-email</v-icon>
                     Send
@@ -55,6 +68,8 @@
             </a>
         </div>
 
+        <hr>
+
         <h2 class="mb-3 display-2 text-uppercase">
             Want to get in touch?
         </h2>
@@ -64,8 +79,8 @@
             out what other projects we're working and feel free to drop us a message if you have any questions!
         </div>
 
-        <v-layout row my-5 py-5>
-            <v-flex xs12 sm6 px-3>
+        <v-layout row my-5 py-5 style="margin-bottom: 8em !important">
+            <v-flex my-4 xs12 sm6 px-3>
                 <v-btn dark
                        color="#1da1f2"
                        class="text-none"
@@ -85,7 +100,7 @@
                 </v-btn>
             </v-flex>
 
-            <v-flex xs12 sm6 px-3>
+            <v-flex my-4 xs12 sm6 px-3>
                 <v-btn dark
                        color="#1da1f2"
                        class="text-none"
@@ -132,6 +147,10 @@
     @Component
     export default class AboutView extends Vue {
         mounted() {
+            this.$nextTick(() => {
+                (window as any).twttr.widgets.load();
+            });
+
             // Send simple ping without coordinates for privacy reasons.
             this.$gtag.pageview({
                 "page_title": "AboutView",
@@ -152,11 +171,22 @@
         margin-bottom: 6em;
 
         h2 {
-            padding: 2em 0 0.5em 0;
+            padding-bottom: 0.5em;
 
             &:first-child {
                 padding-top: 1em;
             }
+        }
+
+        strong {
+            color: #3f51b5
+        }
+
+        hr {
+            height: 2px;
+            margin: 6em 10%;
+            border: 0;
+            background-color: #d5d5d5;
         }
 
         .body-1 {
@@ -166,10 +196,6 @@
 
         .twitter-feed {
             margin: 3em 0;
-        }
-
-        .footer {
-            margin-top: 3em !important;
         }
     }
 </style>
