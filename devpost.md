@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 ![logo](pothole-map.png)
 
-# Pothole AI
-=======
-# Pothole AI
-![logo](docs/logo.png)
->>>>>>> 8caf7d3ae932f976b110daed6d2fef7057f299d0
+# Pothole AI/Map
 
 Pothole AI was designed after looking at a dashcam and asking "What if we used Edge Analytics on a dashcam to map out
  where potholes were, so that local governments and communities knew where to focus their efforts?".
