@@ -284,9 +284,8 @@ To use a different model on the raspberry pi, copy it to your Pi and refer to it
 
 ## Challenges we ran into
 
-## What we ran into problems with
 ### No prebuilt python wheels on PiPi for Arm71
-Currently pipi does not have any Armv71 (Raspberry Pis current architecture) wheels for PyTorch. 
+Currently PiPi does not have any Armv71 (Raspberry Pis current architecture) wheels for PyTorch. 
 There are currently some issues compiling PyTorch from source on a Raspberry Pi [shout out to Minki-Kim95 for their post of how to fix this.](https://github.com/pytorch/pytorch/issues/26455.) Compiling PyTorch on a Raspberry pi took 2+ hours.
  
 The version of torchvision in PiPi for Arm71 is very old and does not support ```torchvision.models```. The latest version also had to be compiled from source (this was a lot faster).
